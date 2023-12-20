@@ -1,0 +1,55 @@
+name: "Add, Get, and Delete Users"
+description:
+  - "Get the existing users, confirming that Alice, Bob and Charlie are present"
+
+variables:
+  BASE_URL: "http://127.0.0.1:2396"
+
+steps:
+  - name: "Reset the server's memory"
+    method: "GET"
+    url: "${BASE_URL}/"
+    expected_status_code: 200
+  - name: "Get existing users"
+    method: "GET"
+    url: "${BASE_URL}/users"
+    expected_status_code: 200
+    response_contains:
+      users:
+        - name: "Alice"
+        - name: "Bob"
+        - name: "Charlie"
+  - name: "Add a new user"
+    method: "POST"
+    url: "${BASE_URL}/users/name=Dave"
+    expected_status_code: 200
+    request_body:
+      name: "Dave"
+  - name: "Get existing users, check that Dave was added"
+    method: "GET"
+    url: "${BASE_URL}/users"
+    expected_status_code: 200
+    response_contains:
+      users:
+        - name: "Dave"
+  - name: "Delete a user"
+    method: "DELETE"
+    url: "${BASE_URL}/users/name=Charlie"
+    expected_status_code: 200
+    response_contains:
+      message: "Deleted user Charlie"
+  - name: "Get existing users, check that Charlie was deleted"
+    method: "GET"
+    url: "${BASE_URL}/users"
+    expected_status_code: 200
+    response_contains:
+      users:
+        - name: "Alice"
+        - name: "Bob"
+        - name: "Dave"
+  - name: "Try to delete a user that doesn't exist"
+    method: "DELETE"
+    url: "${BASE_URL}/users/name=Charlie"
+    expected_status_code: 404
+    response_contains:
+      message: "User Charlie not found"

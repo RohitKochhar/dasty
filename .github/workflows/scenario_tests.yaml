@@ -1,0 +1,32 @@
+name: Run Server and Scenario Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        pip install -r ./tests/requirements.txt
+
+    - name: Start simple server
+      run: |
+        python ./examples/simple_server.py &
+        sleep 3  # Wait for the server to start
+
+    - name: Run scenario tests
+      run: |
+        python3 -m tests.test_scenario_runner

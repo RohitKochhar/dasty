@@ -18,6 +18,56 @@ pip install dasty_api
 
 ## Usage
 
+### Quickstart
+
+This repository comes with a sample server and Scenarios that can be used for quick hands-on sandboxing.
+
+To run these Scenarios, do the following:
+
+0. From the `examples` sub-directory
+
+```bash
+cd ./examples
+```
+
+1. Install the dependencies required for the examples
+
+```bash
+pip install -r requirements.txt
+```
+
+2. Run the simple server. This will create a simple server that listens on `localhost:2396`
+
+```bash
+python3 simple_server.py
+```
+
+3. Run the ScenarioRunner
+
+```bash
+python3 scenario_runner.py
+```
+
+4. If successful, the output should look as follows:
+
+```
+Running scenario Add, Get, and Delete Users defined in examples/scenarios/add_get_delete_users.yaml...
+        Running step Reset the server's memory... Success ✅
+        Running step Get existing users... Success ✅
+        Running step Add a new user... Success ✅
+        Running step Get existing users, check that Dave was added... Success ✅
+        Running step Delete a user... Success ✅
+        Running step Get existing users, check that Charlie was deleted... Success ✅
+        Running step Try to delete a user that doesn't exist... Success ✅
+Add, Get, and Delete Users Success ✅
+Running scenario Sample Service: Health Checks defined in examples/scenarios/healthchecks.yaml...
+        Running step Health Check... Success ✅
+        Running step Readiness Check... Success ✅
+Sample Service: Health Checks Success ✅
+```
+
+### Using dasty in your project
+
 Dasty allows you to define your API test scenarios in YAML files. Here's a basic example:
 
 ```yaml
@@ -37,34 +87,23 @@ steps:
     expected_status_code: 200
 ```
 
-The recommended structure is creating a folder named `dasty_tests`, containing a sub-folder named `scenarios`, along with a `main.py` file which looks like:
+More examples can be found in the [`examples`](http://github.com/RohitKochhar/dasty/examples) subdirectory.
+
+The recommended structure is creating a folder named `dasty_tests`, containing a sub-folder named `scenarios`, containing the Scenario YAML files, along with a `scenario_runner.py` file which looks like:
 
 ```python
-from dasty_api.dasty import YAMLScenario
-import pathlib
-import sys
+from dasty_api.ScenarioRunner import ScenarioRunner
 
 if __name__ == "__main__":
-    # Use the provided file path if one is provided
-    if len(sys.argv) > 1:
-        filepath = sys.argv[1]
-        scenario = YAMLScenario(filepath=filepath)
-        scenario.run()
-    # Otherwise, run all the scenarios in the scenarios directory
-    else:
-        scenario_directory = pathlib.Path("./scenarios")
-        # Get each file name in the target directory
-        scenario_filepaths = [str(path) for path in scenario_directory.glob("*.yaml")]
-        # Create a YAML scenario for each file
-        scenarios = [YAMLScenario(filepath=filepath) for filepath in scenario_filepaths]
-        for scenario in scenarios:
-            scenario.run()
+    runner = ScenarioRunner("./scenarios")
+    runner.run()
+
 ```
 
 Then, the `dasty-tests` folder should look like:
 ```
 .
-├── main.py
+├── scenario_runner.py
 └── scenarios
     ├── ...
     └── sample_scenario.yaml
