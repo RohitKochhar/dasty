@@ -39,6 +39,7 @@ class Step:
 
         # Save response values into variables if specified
         if self.extract:
+            response_json = response.json()
             for item in self.extract:
                 variable_name = item['name']
                 path = item['from'].split('.')
