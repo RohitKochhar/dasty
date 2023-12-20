@@ -1,0 +1,67 @@
+name: Publish Python Package
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install setuptools wheel twine
+      - name: Build package
+        run: |
+          python setup.py sdist bdist_wheel
+
+  publish-test-pypi:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download built package
+        uses: actions/download-artifact@v2
+        with:
+          name: dist
+      - name: Publish to TestPyPI
+        env:
+          TWINE_USERNAME: ${{ secrets.TEST_PYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.TEST_PYPI_PASSWORD }}
+        run: |
+          twine upload --repository testpypi dist/*
+
+  test-install:
+    needs: publish-test-pypi
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      - name: Install package from TestPyPI
+        run: |
+          python -m pip install --index-url https://test.pypi.org/simple/ dasty-api
+
+  publish-pypi:
+    needs: test-install
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download built package
+        uses: actions/download-artifact@v2
+        with:
+          name: dist
+      - name: Publish to PyPI
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+        run: |
+          twine upload dist/*
