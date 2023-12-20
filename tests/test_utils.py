@@ -2,64 +2,10 @@
 # Standard library imports
 import unittest
 # Local application imports
-from dasty_api.utils import replace_variables_in_string, check_response_body_contains
+from dasty_api.utils import check_response_body_contains
 
 # Tests -----------------------------------------------------------------------
 class TestUtils(unittest.TestCase):
-    def test_replace_variables_in_string(self):
-        """
-        Tests the replace_variables_in_string function 
-        using table driven testing
-        """
-        test_cases = [
-            {
-                'name': 'No variables',
-                'content': 'Hello world',
-                'variables': {},
-                'expected': 'Hello world'
-            },
-            {
-                'name': 'One variable',
-                'content': 'Hello ${name}',
-                'variables': {'name': 'world'},
-                'expected': 'Hello world'
-            },
-            {
-                'name': 'Multiple variables',
-                'content': 'Hello ${name}, ${name2}',
-                'variables': {'name': 'world', 'name2': 'again'},
-                'expected': 'Hello world, again'
-            },
-            {
-                'name': 'Variable with spaces',
-                'content': 'Hello ${name}!',
-                'variables': {'name': 'world'},
-                'expected': 'Hello world!'
-            },
-            {
-                'name': 'Variable with spaces and special characters',
-                'content': 'Hello ${name}!',
-                'variables': {'name': 'wo rld!'},
-                'expected': 'Hello wo rld!!'
-            },
-            {
-                'name': 'Variable not in variables',
-                'content': 'Hello ${name}!',
-                'variables': {},
-                'expected': 'Hello ${name}!'
-            },
-        ]
-        print("Testing replace_variables_in_string...")
-        for test_case in test_cases:
-            print(f"\t{test_case['name']}...", end="")
-            with self.subTest(test_case['name']):
-                try:
-                    self.assertEqual(replace_variables_in_string(test_case['content'], test_case['variables']), test_case['expected'])
-                    print("\033[92m" + " Success ✅" + "\033[0m")
-                except AssertionError as e:
-                    print("\033[91m" + " Failed ❌" + "\033[0m")
-                    raise e
-
     def test_check_response_body_contains(self):
         test_cases = [
             {

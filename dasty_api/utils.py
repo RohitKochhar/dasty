@@ -3,46 +3,7 @@
 import json
 import re
 
-# Helper functions -----------------------------------------------------------
-def replace_variables_in_string(content, variables):
-    """
-    Replaces all the variables specified with ${VARIABLE_NAME} in the content string
-    with a value from the provided variables dictionary.
-    
-    Parameters:
-        content (str): The content string
-        variables (dict): The dictionary containing the variables and their values
-
-    Returns:
-        str: The content string with the variables replaced with their values
-
-    Examples:
-        >>> replace_variables_in_string('Hello ${name}', {'name': 'world'})
-        'Hello world'
-    """
-    for var, value in variables.items():
-        content = re.sub(rf'\$\{{{var}\}}', value, content)
-    return content
-
-def check_key_value_in_json(json_data, key, value):
-    str = json.dumps(json_data)
-    substr = f'"{key}": {value}'
-    return substr in str
-
-def replace_variables(content, variables):
-    """
-    Replaces all the variables specified with ${VARIABLE_NAME} in the content with
-    a value from the provided variables dictionary.
-    """
-    if isinstance(content, dict):
-        return {k: replace_variables(v, variables) for k, v in content.items()}
-    elif isinstance(content, list):
-        return [replace_variables(item, variables) for item in content]
-    elif isinstance(content, str):
-        return replace_variables_in_string(content, variables)
-    else:
-        return content
-
+# Helper functions ------------------------------------------------------------- 
 def check_response_body_contains(json_data, yaml_data):
     """
     Checks if the specified items in the YAML content are found in the JSON data.
@@ -75,3 +36,27 @@ def check_response_body_contains(json_data, yaml_data):
         return True
 
     return traverse(json_data, yaml_data)
+
+def replace_variables_in_string(content, variables):
+    """
+    Replaces all the variables specified with ${VARIABLE_NAME} in the content string
+    with a value from the provided variables dictionary.
+    """
+    if not isinstance(content, str):
+        content = str(content)  # Convert non-strings to strings
+    pattern = re.compile(r'\$\{(\w+)\}')
+    return pattern.sub(lambda m: str(variables.get(m.group(1), m.group(0))), content)
+
+def replace_variables(content, variables):
+    """
+    Recursively replaces variables in a given content. The content can be a
+    dictionary, list, or string. Variables are identified by the ${VARIABLE_NAME} syntax.
+    """
+    if isinstance(content, dict):
+        return {k: replace_variables(v, variables) for k, v in content.items()}
+    elif isinstance(content, list):
+        return [replace_variables(item, variables) for item in content]
+    elif isinstance(content, str):
+        return replace_variables_in_string(content, variables)
+    else:
+        return content

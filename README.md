@@ -9,6 +9,7 @@ Dasty is a Python package designed to simplify the process of testing APIs by al
 - **Declarative Syntax**: Define API tests in a simple, human-readable YAML format.
 - **Flexible Test Scenarios**: Support various HTTP methods and validations.
 - **Easy Variable Substitution**: Define and use variables within your YAML test scenarios.
+- **Dynamic Variable Passing Between Steps**: Extract and reuse values from responses in subsequent steps.
 
 ## Installation
 
@@ -119,4 +120,23 @@ Running scenario Users Service: Health Checks defined in scenarios/healthcheck_u
         Running step Health Check... Success ✅
         Running step Readiness Check... Success ✅
 Users Service: Health Checks Success ✅
+```
+
+## Features
+
+### Dynamic Variable Passing
+
+Dasty supports dynamic variable passing between steps in a scenario. This allows you to extract values from the response of one step and use them in subsequent steps. For example:
+
+```yaml
+steps:
+  - name: "Get user ID"
+    method: "GET"
+    url: "${BASE_URL}/users/name=John"
+    save_response_values:
+      - name: user_id
+        from: id
+  - name: "Use the User ID in another request"
+    method: "GET"
+    url: "${BASE_URL}/users/id=${user_id}"
 ```
