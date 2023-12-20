@@ -1,7 +1,7 @@
 # Imports ---------------------------------------------------------------------
 # Standard library imports
 import json
-# import re
+import re
 
 # Helper functions ------------------------------------------------------------- 
 def check_response_body_contains(json_data, yaml_data):
@@ -36,3 +36,27 @@ def check_response_body_contains(json_data, yaml_data):
         return True
 
     return traverse(json_data, yaml_data)
+
+def replace_variables_in_string(content, variables):
+    """
+    Replaces all the variables specified with ${VARIABLE_NAME} in the content string
+    with a value from the provided variables dictionary.
+    """
+    if not isinstance(content, str):
+        content = str(content)  # Convert non-strings to strings
+    pattern = re.compile(r'\$\{(\w+)\}')
+    return pattern.sub(lambda m: str(variables.get(m.group(1), m.group(0))), content)
+
+def replace_variables(content, variables):
+    """
+    Recursively replaces variables in a given content. The content can be a
+    dictionary, list, or string. Variables are identified by the ${VARIABLE_NAME} syntax.
+    """
+    if isinstance(content, dict):
+        return {k: replace_variables(v, variables) for k, v in content.items()}
+    elif isinstance(content, list):
+        return [replace_variables(item, variables) for item in content]
+    elif isinstance(content, str):
+        return replace_variables_in_string(content, variables)
+    else:
+        return content

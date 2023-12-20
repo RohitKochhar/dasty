@@ -26,3 +26,11 @@ steps:
     response_contains:
       user:
         name: Alice
+  - name: "Echo Alice's ID"
+    method: "POST"
+    url: "${BASE_URL}/echo"
+    expected_status_code: 200
+    request_body:
+      alice_id: "${alice_id}"
+    response_contains:
+      alice_id: "${alice_id}"

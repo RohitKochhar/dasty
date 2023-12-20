@@ -2,7 +2,7 @@
 # Standard library imports
 import requests # type: ignore
 # Local application imports
-from .utils import check_response_body_contains
+from .utils import check_response_body_contains, replace_variables
 
 # Classes ---------------------------------------------------------------------
 class Step:
@@ -19,7 +19,8 @@ class Step:
         print(f"\tRunning step {self.name}...", end="")
         # Replace variables in the url
         self.url = self.url.format(**variables).replace("$", "")
-
+        self.request_body = {key: value.format(**variables).replace("$", "") for key, value in self.request_body.items()} if self.request_body is not None else None
+  
         if self.method == "GET":
             response = requests.get(self.url)
         elif self.method == "POST":
@@ -30,14 +31,15 @@ class Step:
             raise ValueError(f"Invalid method {self.method}")
         assert response.status_code == self.expected_status_code, f'Error during \"{self.name}\" step:\nExpected {self.expected_status_code}, instead got {response.status_code}'
         
-        # Check if the response contains the expected key-value pair (simple structure)
+        # Replace variables in response_contains and perform the check
         if self.response_contains is not None:
+            print("Variables:", variables)
+            formatted_response_contains = replace_variables(self.response_contains, variables)
             response_json = response.json()
-            assert check_response_body_contains(response_json, self.response_contains), f'Error during \"{self.name}\" step:\Response: \n{response_json}\n Does not contain: \n{self.response_contains}'
+            assert check_response_body_contains(response_json, formatted_response_contains), f'Error during \"{self.name}\" step:\nResponse: \n{response_json}\n Does not contain: \n{formatted_response_contains}'
 
         # Save response values into variables if specified
         if self.save_response_values:
-            response_json = response.json()
             for item in self.save_response_values:
                 variable_name = item['name']
                 path = item['from'].split('.')

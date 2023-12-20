@@ -43,6 +43,15 @@ async def handle_get_users():
     """
     return {"users": users}
 
+@app.route('/echo', methods=['POST'])
+async def handle_post_echo():
+    """
+    Returns the request body
+    """
+    print(await quart.request.get_json())
+    return await quart.request.get_json()
+
+# users/id --------------------------------------------------------------------
 @app.route('/users/id=<int:id>', methods=['GET'])
 async def handle_get_users_id(id):
     """
@@ -53,6 +62,19 @@ async def handle_get_users_id(id):
             return {"user": user}
     return {"message": f"User {id} not found"}, 404
 
+@app.route('/users/id=<int:id>', methods=['DELETE'])
+async def handle_delete_users_id(id):
+    """
+    Deletes a user
+    """
+    # Get the index of the user with the specified id
+    for user in users:
+        if user["id"] == id:
+            users.remove(user)
+            return {"message": f"Deleted user {id}"}, 200
+    return {"message": f"User {id} not found"}, 404
+
+# users/name ------------------------------------------------------------------
 @app.route('/users/name=<name>', methods=['GET'])
 async def handle_get_users_name(name):
     """
