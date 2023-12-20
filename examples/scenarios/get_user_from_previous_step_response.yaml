@@ -16,7 +16,7 @@ steps:
     response_contains:
       user:
         name: Alice
-    save_response_values:
+    extract:
       - name: alice_id
         from: user.id
   - name: "Get user Alice by ID"
