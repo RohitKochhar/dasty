@@ -6,6 +6,10 @@ variables:
   BASE_URL: "http://127.0.0.1:2396"
 
 steps:
+  - name: "Reset the server's memory"
+    method: "GET"
+    url: "${BASE_URL}/"
+    expected_status_code: 200
   - name: "Get existing users"
     method: "GET"
     url: "${BASE_URL}/users"

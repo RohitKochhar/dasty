@@ -12,6 +12,16 @@ users = [
 ]
 
 # Routes ----------------------------------------------------------------------
+@app.route('/')
+async def handle_get_root():
+    """
+    Resets the users global variable
+    """
+    global users 
+    users = [{"id": 0, "name": "Alice"}, {"id": 1, "name": "Bob"}, {"id": 2, "name": "Charlie"}]
+
+    return 'OK'
+
 @app.route('/healthz')
 async def handle_get_healthz():
     """
