@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='dasty_api',
-    version='0.2.1',
+    version='0.2.6',
     author='Rohit Singh',
     author_email='rsingh.yaml@gmail.com',
     description='Declarative API Scenario Testing in YAML - Easily define and run API tests using YAML.',

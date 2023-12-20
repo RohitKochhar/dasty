@@ -6,7 +6,7 @@ on:
       - 'v*'
 
 jobs:
-  build:
+  build-publish-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -21,21 +21,6 @@ jobs:
       - name: Build package
         run: |
           python setup.py sdist bdist_wheel
-      - name: Upload dist as artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: dist
-          path: dist/
-
-  publish-test-pypi:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Download built package
-        uses: actions/download-artifact@v2
-        with:
-          name: dist
       - name: Publish to TestPyPI
         env:
           TWINE_USERNAME: ${{ secrets.TEST_PYPI_USERNAME }}
@@ -44,26 +29,35 @@ jobs:
           twine upload --repository testpypi dist/*
 
   test-install:
-    needs: publish-test-pypi
+    needs: build-publish-test
     runs-on: ubuntu-latest
     steps:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: '3.x'
+      - name: Extract tag name
+        run: echo "TAG_NAME=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_ENV
       - name: Install package from TestPyPI
         run: |
-          python -m pip install --index-url https://test.pypi.org/simple/ dasty-api
+         pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ dasty-api==${{ env.TAG_NAME }}
 
-  publish-pypi:
+  build-publish-pypi:
     needs: test-install
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Download built package
-        uses: actions/download-artifact@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
         with:
-          name: dist
+          python-version: '3.x'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install setuptools wheel twine
+      - name: Build package
+        run: |
+          python setup.py sdist bdist_wheel
       - name: Publish to PyPI
         env:
           TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
