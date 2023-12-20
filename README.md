@@ -1,5 +1,7 @@
 # Dasty: Declarative API Scenario Testing in YAML
 
+<img src="./dasty.png" alt="Dasty Logo" width="200"/>
+
 Dasty is a Python package designed to simplify the process of testing APIs by allowing tests to be defined declaratively in YAML format. This approach enables easy-to-write, easy-to-read API test scenarios, making API testing more accessible and maintainable.
 
 ## Features
