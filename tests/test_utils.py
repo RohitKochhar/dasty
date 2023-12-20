@@ -2,7 +2,7 @@
 # Standard library imports
 import unittest
 # Local application imports
-from dasty_api.utils import check_key_value_in_json, replace_variables_in_string, replace_variables, check_response_body_contains
+from dasty_api.utils import replace_variables_in_string, check_response_body_contains
 
 # Tests -----------------------------------------------------------------------
 class TestUtils(unittest.TestCase):
@@ -58,6 +58,7 @@ class TestUtils(unittest.TestCase):
                     print("\033[92m" + " Success ✅" + "\033[0m")
                 except AssertionError as e:
                     print("\033[91m" + " Failed ❌" + "\033[0m")
+                    raise e
 
     def test_check_response_body_contains(self):
         test_cases = [
