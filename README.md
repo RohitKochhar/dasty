@@ -87,7 +87,7 @@ steps:
     expected_status_code: 200
 ```
 
-More examples can be found in the [`examples`](http://github.com/RohitKochhar/dasty/examples) subdirectory.
+More examples can be found in the [`examples`](https://github.com/RohitKochhar/dasty/tree/main/examples) subdirectory.
 
 The recommended structure is creating a folder named `dasty_tests`, containing a sub-folder named `scenarios`, containing the Scenario YAML files, along with a `scenario_runner.py` file which looks like:
 
