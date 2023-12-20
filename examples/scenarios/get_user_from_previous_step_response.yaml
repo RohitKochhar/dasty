@@ -1,0 +1,28 @@
+name: "Get user from previous step response"
+description:
+- "This scenario demonstrates how to get a value from the response of a previous step and use it in the next step."
+variables:
+  BASE_URL: "http://127.0.0.1:2396"
+
+steps:
+  - name: "Reset the server's memory"
+    method: "GET"
+    url: "${BASE_URL}/"
+    expected_status_code: 200
+  - name: "Get existing user Alice"
+    method: "GET"
+    url: "${BASE_URL}/users/name=Alice"
+    expected_status_code: 200
+    response_contains:
+      user:
+        name: Alice
+    save_response_values:
+      - name: alice_id
+        from: user.id
+  - name: "Get user Alice by ID"
+    method: "GET"
+    url: "${BASE_URL}/users/id=${alice_id}"
+    expected_status_code: 200
+    response_contains:
+      user:
+        name: Alice

@@ -18,9 +18,10 @@ class YAMLScenario:
         self.description = yaml_content['description']
         self.steps = [Step(**step) for step in yaml_content['steps']]
 
+        self.variables = variables
 
     def run(self) -> None:
         print(f"Running scenario {self.name} defined in {self.filepath}...")
         for step in self.steps:
-            step()
+            self.variables = step(self.variables)
         print("\033[92m" + f"{self.name} Success ✅" + "\033[0m")

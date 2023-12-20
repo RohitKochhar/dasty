@@ -43,6 +43,26 @@ async def handle_get_users():
     """
     return {"users": users}
 
+@app.route('/users/id=<int:id>', methods=['GET'])
+async def handle_get_users_id(id):
+    """
+    Returns a user with the specified id
+    """
+    for user in users:
+        if user["id"] == id:
+            return {"user": user}
+    return {"message": f"User {id} not found"}, 404
+
+@app.route('/users/name=<name>', methods=['GET'])
+async def handle_get_users_name(name):
+    """
+    Returns a user with the specified name
+    """
+    for user in users:
+        if user["name"] == name:
+            return {"user": user}
+    return {"message": f"User {name} not found"}, 404
+
 @app.route('/users/name=<name>', methods=['POST'])
 async def handle_post_users(name):
     """
