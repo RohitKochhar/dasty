@@ -1,9 +1,15 @@
-
+# Imports ---------------------------------------------------------------------
+# Standard library imports
+import os
 from setuptools import setup, find_packages
 
+# Globals ---------------------------------------------------------------------
+version = os.getenv('TAG_NAME', '0.0.1')  # Default to '0.0.1' if TAG_NAME is not set
+
+# Setup -----------------------------------------------------------------------
 setup(
     name='dasty_api',
-    version='0.2.7',
+    version=version,
     author='Rohit Singh',
     author_email='rsingh.yaml@gmail.com',
     description='Declarative API Scenario Testing in YAML - Easily define and run API tests using YAML.',
