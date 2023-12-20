@@ -33,7 +33,6 @@ class Step:
         
         # Replace variables in response_contains and perform the check
         if self.response_contains is not None:
-            print("Variables:", variables)
             formatted_response_contains = replace_variables(self.response_contains, variables)
             response_json = response.json()
             assert check_response_body_contains(response_json, formatted_response_contains), f'Error during \"{self.name}\" step:\nResponse: \n{response_json}\n Does not contain: \n{formatted_response_contains}'
