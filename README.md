@@ -133,7 +133,7 @@ steps:
   - name: "Get user ID"
     method: "GET"
     url: "${BASE_URL}/users/name=John"
-    save_response_values:
+    extract:
       - name: user_id
         from: id
   - name: "Use the User ID in another request"
