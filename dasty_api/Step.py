@@ -18,7 +18,8 @@ class Step:
             response_includes: dict = None, 
             response_excludes: dict = None,
             request_body: dict = None, 
-            extract: list = None
+            extract: list = None,
+            output: list = None
         ) -> None:
         """
         Constructs a Step object from the given parameters.
@@ -34,6 +35,7 @@ class Step:
         self.response_includes = response_includes
         self.response_excludes = response_excludes
         self.extract = extract
+        self.output = output
 
     def __call__(self, variables) -> dict:
         print(f"\tRunning step {self.name}...", end="")
@@ -89,5 +91,12 @@ class Step:
                 variables[variable_name] = value
 
         print("\033[92m" + f" Success ✅" + "\033[0m")
+
+        # Print variables if specified
+        if self.output:
+            print("\t\tOutputs:")
+            for println in self.output:
+                formatted_println = replace_variables(println, variables)
+                print(f"\t\t- {formatted_println}")
 
         return variables

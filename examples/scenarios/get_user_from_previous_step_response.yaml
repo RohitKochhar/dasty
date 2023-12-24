@@ -31,3 +31,6 @@ steps:
       alice_id: "${alice_id}"
     response_includes:
       alice_id: "${alice_id}"
+    # Alternatively, the output function can be used:
+    output:
+      - "Alice's ID is ${alice_id}"
