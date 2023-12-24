@@ -1,38 +1,34 @@
-# Imports ---------------------------------------------------------------------
-# Standard library imports
 import requests # type: ignore
-# Local application imports
 from .utils import check_response_body_contains, replace_variables, check_response_length
 
-# Classes ---------------------------------------------------------------------
 class Step:
-    def __init__(
-            # Required parameters
-            self,
-            name: str,
-            method: str,
-            url: str,
-            expected_status_code: int,
-            # Optional parameters
-            headers: dict = None,
-            response_includes: dict = None, 
-            response_excludes: dict = None,
-            response_length: dict = None,
-            request_body: dict = None, 
-            extract: list = None,
-            output: list = None,
-            expect: dict = None,
-        ) -> None:
+    def __init__(self, name: str, method: str, url: str, expected_status_code: int,
+                 headers: dict = None, response_includes: dict = None,
+                 response_excludes: dict = None, response_length: dict = None,
+                 request_body: dict = None, extract: list = None,
+                 output: list = None, expect: dict = None) -> None:
         """
-        Constructs a Step object from the given parameters.
+        Initializes a new Step instance with the given parameters.
+        
+        Args:
+            name (str): Name of the step.
+            method (str): HTTP method to be used.
+            url (str): URL for the HTTP request.
+            expected_status_code (int): Expected HTTP status code.
+            headers (dict, optional): Headers to include in the request.
+            response_includes (dict, optional): Conditions to check within the response body for inclusion.
+            response_excludes (dict, optional): Conditions to check within the response body for exclusion.
+            response_length (dict, optional): Expected length(s) of certain fields in the response body.
+            request_body (dict, optional): Request body for POST, PUT, PATCH requests.
+            extract (list, optional): Variables to extract from the response.
+            output (list, optional): Output messages or variables to print.
+            expect (dict, optional): Expectations about variables to assert.
         """
-        # Required parameters
         self.name = name
-        self.method = method
+        self.method = method.upper()
         self.url = url
         self.expected_status_code = expected_status_code
-        # Optional parameters
-        self.headers = headers
+        self.headers = headers or {}
         self.request_body = request_body
         self.response_includes = response_includes
         self.response_excludes = response_excludes
@@ -42,84 +38,153 @@ class Step:
         self.expect = expect
 
     def __call__(self, variables) -> dict:
-        print(f"\tRunning step {self.name}...", end="")
-        # Replace variables in the url
-        self.url = self.url.format(**variables).replace("$", "")
-        self.request_body = {key: value.format(**variables).replace("$", "") for key, value in self.request_body.items()} if self.request_body is not None else None
-  
-        method_func = {
-            "GET": requests.get,
-            "POST": requests.post,
-            "PUT": requests.put,
-            "DELETE": requests.delete,
-            "PATCH": requests.patch,
-            "HEAD": requests.head,
-            "OPTIONS": requests.options,
-        }.get(self.method)
+        """
+        Executes the step by preparing the request, making the request, and validating the response.
 
+        Args:
+            variables (dict): Dictionary of variables to be used in this step.
+
+        Returns:
+            dict: Updated variables after extracting new ones from the response.
+        """
+        print(f"\tRunning step {self.name}...", end="")
+        self._prepare_request(variables)
+        response = self._make_request()
+        self._validate_response(response, variables)
+        print("\033[92m Success ✅\033[0m")
+        return variables
+
+    def _prepare_request(self, variables):
+        """
+        Prepares the request by replacing variables in the URL and request body.
+
+        Args:
+            variables (dict): Dictionary of variables to be replaced in the request.
+        """
+        self.url = replace_variables(self.url, variables)
+        if self.request_body:
+            self.request_body = {k: replace_variables(v, variables)
+                                 for k, v in self.request_body.items()}
+
+    def _make_request(self):
+        """
+        Makes the HTTP request based on the method, URL, and other parameters set during initialization.
+
+        Returns:
+            requests.Response: The response object returned by the request.
+        """
+        request_methods = {
+            "GET": requests.get, "POST": requests.post,
+            "PUT": requests.put, "DELETE": requests.delete,
+            "PATCH": requests.patch, "HEAD": requests.head,
+            "OPTIONS": requests.options
+        }
+
+        method_func = request_methods.get(self.method)
         if not method_func:
             raise ValueError(f"Unsupported HTTP method: {self.method}")
 
-        # Call the requests function with the provided parameters
         if self.method in ["GET", "HEAD", "OPTIONS"]:
-            response = method_func(self.url, headers=self.headers)
-        elif self.method in ["POST", "PUT", "PATCH", "DELETE"]:
-            response = method_func(self.url, json=self.request_body, headers=self.headers)
+            return method_func(self.url, headers=self.headers)
         else:
-            # NOTE: This block is unreachable, but is kept here for completeness
-            raise ValueError(f"Unsupported HTTP method: {self.method}")
+            return method_func(self.url, json=self.request_body, headers=self.headers)
 
-        assert response.status_code == self.expected_status_code, f'Error during \"{self.name}\" step:\nExpected {self.expected_status_code}, instead got {response.status_code}'
+    def _validate_response(self, response, variables):
+        """
+        Validates the response against the expected status code and response conditions.
+
+        Args:
+            response (requests.Response): The response object to validate.
+            variables (dict): Dictionary of variables for response validation.
+        """
+        assert response.status_code == self.expected_status_code, \
+            f'Error during \"{self.name}\" step: Expected {self.expected_status_code}, got {response.status_code}'
         
-        # Replace variables in response_includes and perform the check
-        if self.response_includes is not None:
-            formatted_response_includes = replace_variables(self.response_includes, variables)
+        try:
             response_json = response.json()
-            assert check_response_body_contains(response_json, formatted_response_includes), f'Error during \"{self.name}\" step:\nResponse: \n{response_json}\n Does not contain: \n{formatted_response_includes}'
+        except requests.exceptions.JSONDecodeError:
+            # If the response is not JSON, wrap it in a JSON object
+            response_json = {"response": response.text}
+        self._check_response_contents(response_json, variables)
+        self._extract_and_output(response_json, variables)
+        self._verify_expectations(variables)
 
-        # Replace variables in response_excludes and perform the check
-        if self.response_excludes is not None:
-            formatted_response_excludes = replace_variables(self.response_excludes, variables)
-            response_json = response.json()
-            assert not check_response_body_contains(response_json, formatted_response_excludes), f'Error during \"{self.name}\" step:\nResponse: \n{response_json}\n Contains: \n{formatted_response_excludes}'
+    def _check_response_contents(self, response_json, variables):
+        """
+        Checks if the response contains or excludes specific content, and if it matches specified lengths.
 
-        # Replace variables in response_length and perform the check
-        if self.response_length is not None:
-            formatted_response_length = replace_variables(self.response_length, variables)
-            response_json = response.json()
-            assert check_response_length(response_json, formatted_response_length), f'Error during "{self.name}" step:\nResponse length mismatch in: \n{response_json}\nExpected lengths: \n{formatted_response_length}'
+        Args:
+            response_json (dict): JSON data from the response.
+            variables (dict): Dictionary of variables to be used in the check.
+        """
+        if self.response_includes:
+            includes = replace_variables(self.response_includes, variables)
+            assert check_response_body_contains(response_json, includes), \
+                f'Error during \"{self.name}\" step: Response does not include expected content.'
 
-        # Save response values into variables if specified
+        if self.response_excludes:
+            excludes = replace_variables(self.response_excludes, variables)
+            assert not check_response_body_contains(response_json, excludes), \
+                f'Error during \"{self.name}\" step: Response includes excluded content.'
+
+        if self.response_length:
+            lengths = replace_variables(self.response_length, variables)
+            assert check_response_length(response_json, lengths), \
+                f'Error during \"{self.name}\" step: Response length mismatch.'
+
+    def _extract_and_output(self, response_json, variables):
+        """
+        Extracts data from the response and outputs information as specified.
+
+        Args:
+            response_json (dict): JSON data from the response.
+            variables (dict): Dictionary of variables to extract and output.
+        """
         if self.extract:
-            response_json = response.json()
             for item in self.extract:
-                variable_name = item['name']
                 path = item['from'].split('.')
-                value = response_json
-                for p in path:
-                    value = value.get(p)
-                variables[variable_name] = value
+                value = self._get_value_from_path(response_json, path)
+                variables[item['name']] = value
 
-        print("\033[92m" + f" Success ✅" + "\033[0m")
-
-        # Print variables if specified
         if self.output:
             print("\t\tOutputs:")
-            for println in self.output:
-                formatted_println = replace_variables(println, variables)
-                print(f"\t\t- {formatted_println}")
+            for output_line in self.output:
+                formatted_output = replace_variables(output_line, variables)
+                print(f"\t\t- {formatted_output}")
 
+    def _get_value_from_path(self, data, path):
+        """
+        Retrieves a nested value from a dictionary based on a specified path.
+
+        Args:
+            data (dict): The dictionary to search.
+            path (list): A list representing the path to the desired value.
+
+        Returns:
+            The value found at the specified path, or None if not found.
+        """
+        for key in path:
+            data = data.get(key)
+            if data is None:
+                return None
+        return data
+
+    def _verify_expectations(self, variables):
+        """
+        Verifies the expectations set in the 'expect' parameter.
+
+        Args:
+            variables (dict): Dictionary of variables against which to verify expectations.
+        """
         if self.expect:
             for expectation in self.expect:
-                variable_name = expectation['variable']
-                variable = replace_variables(variable_name, variables)
-                if variable_name == variable:
-                    raise ValueError(f"Variable {variable_name} not found in variables")
+                variable = replace_variables(expectation['variable'], variables)
                 operator = expectation['operator']
                 value = replace_variables(expectation['value'], variables)
-                if operator == 'eq':
-                    assert str(variable) == str(value), f'Error during \"{self.name}\" step:\nExpected {variable_name} to be equal to {value}, instead got {variable}'
-                if operator == 'ne':
-                    assert str(variable) != str(value), f'Error during \"{self.name}\" step:\nExpected {variable_name} to be not equal to {value}, instead got {variable}'
 
-        return variables
+                if operator == 'eq':
+                    assert str(variable) == str(value), \
+                        f'Error during \"{self.name}\" step: {variable} is not equal to {value}.'
+                elif operator == 'ne':
+                    assert str(variable) != str(value), \
+                        f'Error during \"{self.name}\" step: {variable} is equal to {value}.'
