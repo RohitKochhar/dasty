@@ -15,6 +15,10 @@ class YAMLScenario:
         self.variables = yaml_content.get('variables', {})
         self.name = yaml_content['name']
         self.description = yaml_content['description']
+        try:
+            self.tags = yaml_content['tags']
+        except KeyError:
+            self.tags = []
         self.steps = [Step(**step) for step in yaml_content['steps']]
 
     def run(self) -> None:
