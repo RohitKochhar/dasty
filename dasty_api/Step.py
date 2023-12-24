@@ -2,7 +2,7 @@
 import requests # type: ignore
 from .utils import check_response_body_contains, replace_variables, check_response_length
 
-# Classes ---------------------------------------------------------------------
+# Step Class ------------------------------------------------------------------
 class Step:
     def __init__(self, name: str, method: str, url: str, expected_status_code: int,
                  headers: dict = None, response_includes: dict = None,

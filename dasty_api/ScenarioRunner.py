@@ -4,6 +4,7 @@ from pathlib import Path
 # Local imports
 from .YAMLScenario import YAMLScenario
 
+# ScenarioRunner class ---------------------------------------------------------
 class ScenarioRunner:
     def __init__(self, directory_name: str, tags=None, **kwargs):
         """
