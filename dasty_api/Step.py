@@ -10,7 +10,21 @@ class Step:
                  request_body: dict = None, extract: list = None,
                  output: list = None, expect: dict = None) -> None:
         """
-        Constructs a Step object from the given parameters.
+        Initializes a new Step instance with the given parameters.
+        
+        Args:
+            name (str): Name of the step.
+            method (str): HTTP method to be used.
+            url (str): URL for the HTTP request.
+            expected_status_code (int): Expected HTTP status code.
+            headers (dict, optional): Headers to include in the request.
+            response_includes (dict, optional): Conditions to check within the response body for inclusion.
+            response_excludes (dict, optional): Conditions to check within the response body for exclusion.
+            response_length (dict, optional): Expected length(s) of certain fields in the response body.
+            request_body (dict, optional): Request body for POST, PUT, PATCH requests.
+            extract (list, optional): Variables to extract from the response.
+            output (list, optional): Output messages or variables to print.
+            expect (dict, optional): Expectations about variables to assert.
         """
         self.name = name
         self.method = method.upper()
@@ -26,6 +40,15 @@ class Step:
         self.expect = expect
 
     def __call__(self, variables) -> dict:
+        """
+        Executes the step by preparing the request, making the request, and validating the response.
+
+        Args:
+            variables (dict): Dictionary of variables to be used in this step.
+
+        Returns:
+            dict: Updated variables after extracting new ones from the response.
+        """
         print(f"\tRunning step {self.name}...", end="")
         self._prepare_request(variables)
         response = self._make_request()
@@ -34,12 +57,24 @@ class Step:
         return variables
 
     def _prepare_request(self, variables):
+        """
+        Prepares the request by replacing variables in the URL and request body.
+
+        Args:
+            variables (dict): Dictionary of variables to be replaced in the request.
+        """
         self.url = replace_variables(self.url, variables)
         if self.request_body:
             self.request_body = {k: replace_variables(v, variables)
                                  for k, v in self.request_body.items()}
 
     def _make_request(self):
+        """
+        Makes the HTTP request based on the method, URL, and other parameters set during initialization.
+
+        Returns:
+            requests.Response: The response object returned by the request.
+        """
         request_methods = {
             "GET": requests.get, "POST": requests.post,
             "PUT": requests.put, "DELETE": requests.delete,
@@ -57,6 +92,13 @@ class Step:
             return method_func(self.url, json=self.request_body, headers=self.headers)
 
     def _validate_response(self, response, variables):
+        """
+        Validates the response against the expected status code and response conditions.
+
+        Args:
+            response (requests.Response): The response object to validate.
+            variables (dict): Dictionary of variables for response validation.
+        """
         assert response.status_code == self.expected_status_code, \
             f'Error during \"{self.name}\" step: Expected {self.expected_status_code}, got {response.status_code}'
         
@@ -70,6 +112,13 @@ class Step:
         self._verify_expectations(variables)
 
     def _check_response_contents(self, response_json, variables):
+        """
+        Checks if the response contains or excludes specific content, and if it matches specified lengths.
+
+        Args:
+            response_json (dict): JSON data from the response.
+            variables (dict): Dictionary of variables to be used in the check.
+        """
         if self.response_includes:
             includes = replace_variables(self.response_includes, variables)
             assert check_response_body_contains(response_json, includes), \
@@ -86,6 +135,13 @@ class Step:
                 f'Error during \"{self.name}\" step: Response length mismatch.'
 
     def _extract_and_output(self, response_json, variables):
+        """
+        Extracts data from the response and outputs information as specified.
+
+        Args:
+            response_json (dict): JSON data from the response.
+            variables (dict): Dictionary of variables to extract and output.
+        """
         if self.extract:
             for item in self.extract:
                 path = item['from'].split('.')
@@ -99,6 +155,16 @@ class Step:
                 print(f"\t\t- {formatted_output}")
 
     def _get_value_from_path(self, data, path):
+        """
+        Retrieves a nested value from a dictionary based on a specified path.
+
+        Args:
+            data (dict): The dictionary to search.
+            path (list): A list representing the path to the desired value.
+
+        Returns:
+            The value found at the specified path, or None if not found.
+        """
         for key in path:
             data = data.get(key)
             if data is None:
@@ -106,6 +172,12 @@ class Step:
         return data
 
     def _verify_expectations(self, variables):
+        """
+        Verifies the expectations set in the 'expect' parameter.
+
+        Args:
+            variables (dict): Dictionary of variables against which to verify expectations.
+        """
         if self.expect:
             for expectation in self.expect:
                 variable = replace_variables(expectation['variable'], variables)
