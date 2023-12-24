@@ -63,3 +63,12 @@ def replace_variables(content, variables):
         return replace_variables_in_string(content, variables)
     else:
         return content
+
+def check_response_length(json_data, response_length_spec):
+    for field, expected_length in response_length_spec.items():
+        if field not in json_data:
+            raise ValueError(f"Field '{field}' not found in the response.")
+
+        actual_length = len(json_data[field])
+        assert actual_length == expected_length, f"Length of '{field}' is {actual_length}, expected {expected_length}."
+    return True
