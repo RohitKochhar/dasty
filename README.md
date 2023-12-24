@@ -141,11 +141,11 @@ steps:
     url: "${BASE_URL}/users/id=${user_id}"
 ```
 
-### Response Validation Assertions
+### Response Validation Functions
 
 Dasty supports a variety of response assertion features to validate API response content.
 
-#### `response_includes`
+#### `response_includes` Function
 
 This assertion ensures specific content is included in the API response. It's essential for verifying the presence of expected data elements. For instance, to confirm that a user object is part of the response, `response_includes` can be used to assert its existence.
 
@@ -165,7 +165,7 @@ In this example, `response_includes` will validate that within the `users` array
 
 A practical example of this feature can be seen in [this scenario](https://github.com/RohitKochhar/dasty/tree/main/examples/scenarios/check_response_body.yaml)
 
-#### `response_excludes`
+#### `response_excludes` Function
 
 Conversely, this assertion ensures that certain content is definitively absent from the response. It is invaluable for confirming that sensitive data is not exposed or to ensure that an entity has been properly removed or is not present.
 
@@ -186,3 +186,31 @@ The `response_excludes` assertion checks that the `users` array in the response 
 With these two assertions, `response_includes` and `response_excludes`, testing for both the presence and absence of data in your API responses becomes straightforward and clear, providing a robust method for validating the state and security of your API endpoints.
 
 A practical example of this feature can be seen in [this scenario](https://github.com/RohitKochhar/dasty/tree/main/examples/scenarios/check_response_body.yaml)
+
+### `output` Function
+
+Dasty also introduces an output function, enabling you to print values extracted from a response or any dynamic variable within the scenario. This feature is especially useful for debugging or when you need to log specific information.
+
+**Usage Example**:
+
+```yaml
+steps:
+  - name: "Echo Alice's ID"
+    method: "POST"
+    url: "${BASE_URL}/echo"
+    expected_status_code: 200
+    request_body:
+      alice_id: "${alice_id}"
+    output:
+      - "Alice's ID is ${alice_id}"
+```
+
+Results in:
+
+```
+    Running step Echo Alice's ID... Success ✅
+            Outputs:
+            - Alice's ID is 0
+```
+
+This feature enhances the debugging capabilities within your testing scenarios, making it easier to trace and understand the flow of data.
