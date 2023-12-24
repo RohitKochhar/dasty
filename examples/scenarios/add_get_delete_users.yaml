@@ -53,3 +53,26 @@ steps:
     expected_status_code: 404
     response_includes:
       message: "User Charlie not found"
+  - name: "Check Alice's ID is 0"
+    method: "GET"
+    url: "${BASE_URL}/users/name=Alice"
+    expected_status_code: 200
+    extract:
+      - name: alice_id
+        from: user.id
+    expect:
+      - variable: ${alice_id}
+        operator: eq
+        value: "0"
+  - name: "Check Bob's ID is NOT 0"
+    method: "GET"
+    url: "${BASE_URL}/users/name=Bob"
+    expected_status_code: 200
+    extract:
+      - name: bob_id
+        from: user.id
+    expect:
+      - variable: ${bob_id}
+        operator: ne
+        value: "0"
+

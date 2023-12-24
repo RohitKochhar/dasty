@@ -214,3 +214,54 @@ Results in:
 ```
 
 This feature enhances the debugging capabilities within your testing scenarios, making it easier to trace and understand the flow of data.
+
+
+### Feature: Variable Value Assertions
+
+### `expect` Function
+
+You can now perform direct comparisons of extracted variables against expected values within your scenarios. This adds an extra layer of validation to your tests, ensuring not only that your API responds correctly, but also that the content of the responses holds the expected values.
+
+**Equality Check (`eq`)**
+
+The `eq` operator is used to assert that a variable is equal to a specified value.
+
+**Usage Example**:
+
+```yaml
+- name: "Check Alice's ID is 0"
+  method: "GET"
+  url: "${BASE_URL}/users/name=Alice"
+  expected_status_code: 200
+  extract:
+    - name: alice_id
+      from: user.id
+  expect:
+    - variable: ${alice_id}
+      operator: eq
+      value: "0"
+```
+
+In this example, the scenario validates that the ID of the user Alice is exactly `0`.
+
+**Inequality Check (`ne`)**
+
+Conversely, the `ne` operator is used to assert that a variable is not equal to a specified value.
+
+**Usage Example**:
+
+```yaml
+- name: "Check Bob's ID is NOT 0"
+  method: "GET"
+  url: "${BASE_URL}/users/name=Bob"
+  expected_status_code: 200
+  extract:
+    - name: bob_id
+      from: user.id
+  expect:
+    - variable: ${bob_id}
+      operator: ne
+      value: "0"
+```
+
+In this example, the scenario verifies that the ID of the user Bob is not `0`.

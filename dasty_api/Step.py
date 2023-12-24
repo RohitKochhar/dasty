@@ -19,7 +19,8 @@ class Step:
             response_excludes: dict = None,
             request_body: dict = None, 
             extract: list = None,
-            output: list = None
+            output: list = None,
+            expect: dict = None,
         ) -> None:
         """
         Constructs a Step object from the given parameters.
@@ -36,6 +37,7 @@ class Step:
         self.response_excludes = response_excludes
         self.extract = extract
         self.output = output
+        self.expect = expect
 
     def __call__(self, variables) -> dict:
         print(f"\tRunning step {self.name}...", end="")
@@ -98,5 +100,18 @@ class Step:
             for println in self.output:
                 formatted_println = replace_variables(println, variables)
                 print(f"\t\t- {formatted_println}")
+
+        if self.expect:
+            for expectation in self.expect:
+                variable_name = expectation['variable']
+                variable = replace_variables(variable_name, variables)
+                if variable_name == variable:
+                    raise ValueError(f"Variable {variable_name} not found in variables")
+                operator = expectation['operator']
+                value = replace_variables(expectation['value'], variables)
+                if operator == 'eq':
+                    assert variable == value, f'Error during \"{self.name}\" step:\nExpected {variable_name} to be equal to {value}, instead got {variable}'
+                if operator == 'ne':
+                    assert variable != value, f'Error during \"{self.name}\" step:\nExpected {variable_name} to be not equal to {value}, instead got {variable}'
 
         return variables
