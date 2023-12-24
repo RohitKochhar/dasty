@@ -1,7 +1,6 @@
 import yaml # type: ignore
 from .Step import Step
 
-# YAMLScenario class -----------------------------------------------------------
 class YAMLScenario:
     def __init__(self, filepath: str) -> None:
         """
