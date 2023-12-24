@@ -265,3 +265,47 @@ Conversely, the `ne` operator is used to assert that a variable is not equal to 
 ```
 
 In this example, the scenario verifies that the ID of the user Bob is not `0`.
+
+
+### Tag-Based Scenario Execution
+
+You can assign one or more tags to each scenario in your testing suite. Tags are used to categorize and selectively run scenarios based on your current testing needs.
+
+**Defining Tags in a Scenario**:
+
+```yaml
+name: "Add, Get, and Delete Users"
+description:
+  - "Get the existing users, confirming that Alice, Bob, and Charlie are present"
+tags:
+  - "example"
+```
+
+In this example, the scenario is tagged with `"example"`. 
+
+### Running Scenarios Based on Tags
+
+When initializing the `ScenarioRunner`, you can specify a list of tags. The runner will then execute only those scenarios that share at least one tag with this list. This allows for targeted testing of specific parts of your application.
+
+**Example Initialization**:
+
+```python
+ScenarioRunner(directory="...", tags=["example"])
+```
+
+Scenarios with at least one common tag with the runner's tags will be included in the test run.
+
+### Special Tag: `ignore`
+
+If a scenario is tagged with `ignore`, it will be excluded from all test runs, regardless of other tags it might have. This is useful for temporarily disabling certain scenarios without removing them from the suite.
+
+**Example of Ignored Scenario**:
+
+```yaml
+name: "Temporarily Disabled Test"
+tags:
+  - "ignore"
+```
+
+With tag-based scenario execution, Dasty provides a more dynamic and controlled testing environment, allowing you to focus on specific areas of your application as needed.
+```

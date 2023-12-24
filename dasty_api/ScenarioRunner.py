@@ -6,8 +6,9 @@ from .YAMLScenario import YAMLScenario
 
 # ScenarioRunner class -----------------------------------------------------------
 class ScenarioRunner():
-    def __init__(self, directory_name, **kwargs):
+    def __init__(self, directory_name, tags=None, **kwargs):
         self.get_directory(directory_name)
+        self.tags = tags
         self.kwargs = kwargs
 
     def get_directory(self, directory_name):
@@ -32,4 +33,15 @@ class ScenarioRunner():
         """
         self.collect_scenarios()
         for scenario in self.scenarios:
-            scenario.run()
+            if "ignore" in scenario.tags:
+                print(f"Skipping scenario {scenario.name} because it has the tag 'ignore'")
+                continue
+            # If no tag was specified for the runner, run all tests
+            if self.tags is None:
+                scenario.run()
+            else:
+                # If tags were provided, check if the scenario has any of them
+                if any(tag in scenario.tags for tag in self.tags):
+                    scenario.run()
+                else:
+                    print(f"Skipping scenario {scenario.name} because it does not have any of the tags {self.tags}")
