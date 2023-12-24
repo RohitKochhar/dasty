@@ -1,0 +1,21 @@
+{
+  "name": "dasty",
+  "version": "1.0.0",
+  "description": "<img src=\"./dasty.png\" alt=\"Dasty Logo\" width=\"200\"/>",
+  "main": "index.js",
+  "directories": {
+    "example": "examples",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "semantic-release": "^22.0.12"
+  }
+}
