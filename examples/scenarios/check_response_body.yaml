@@ -1,38 +1,39 @@
-name: "Check Response Body using response_includes and response_excludes"
+name: Check Response Body using response_includes and response_excludes
 description:
-  - "Resets the server's memory"
-  - "Gets the existing users, confirming that Alice exists"
-  - "Deletes Alice"
-  - "Gets the existing users, confirming that Alice doesn't exist"
+  - Resets the server's memory
+  - Gets the existing users, confirming that Alice exists
+  - Deletes Alice
+  - Gets the existing users, confirming that Alice doesn't exist
 variables:
-  BASE_URL: "http://127.0.0.1:2396"
+  BASE_URL: http://127.0.0.1:2396
 
 steps:
   # Reset the server's memory
-  - name: "Reset the server's memory"
-    method: "GET"
-    url: "${BASE_URL}/"
+  - name: Reset the server's memory
+    method: GET
+    url: ${BASE_URL}/
     expected_status_code: 200
   # Get existing users, check that Alice exists
-  - name: "Get existing users, check that Alice exists"
-    method: "GET"
-    url: "${BASE_URL}/users"
+  - name: Get existing users, check that Alice exists
+    method: GET
+    url: ${BASE_URL}/users
     expected_status_code: 200
     response_includes:
       users:
-        - name: "Alice"
+        - id: 0
+          name: Alice
   # Delete Alice
-  - name: "Delete Alice"
-    method: "DELETE"
-    url: "${BASE_URL}/users/name=Alice"
+  - name: Delete Alice
+    method: DELETE
+    url: ${BASE_URL}/users/name=Alice
     expected_status_code: 200
     response_includes:
-      message: "Deleted user Alice"
+      message: Deleted user Alice
   # Get existing users, check that Alice doesn't exist
-  - name: "Get existing users, check that Alice doesn't exist"
-    method: "GET"
-    url: "${BASE_URL}/users"
+  - name: Get existing users, check that Alice doesn't exist
+    method: GET
+    url: ${BASE_URL}/users
     expected_status_code: 200
     response_excludes:
       users:
-        - name: "Alice"
+        - name: Alice

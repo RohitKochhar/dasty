@@ -1,61 +1,61 @@
-name: "Add, Get, and Delete Users"
+name: Add, Get, and Delete Users
 description:
-  - "Get the existing users, confirming that Alice, Bob and Charlie are present"
+  - Get the existing users, confirming that Alice, Bob and Charlie are present
 
 variables:
-  BASE_URL: "http://127.0.0.1:2396"
+  BASE_URL: http://127.0.0.1:2396
 
 steps:
-  - name: "Reset the server's memory"
-    method: "GET"
-    url: "${BASE_URL}/"
+  - name: Reset the server's memory
+    method: GET
+    url: ${BASE_URL}/
     expected_status_code: 200
-  - name: "Get existing users"
-    method: "GET"
-    url: "${BASE_URL}/users"
+  - name: Get existing users
+    method: GET
+    url: ${BASE_URL}/users
     expected_status_code: 200
     response_includes:
       users:
-        - name: "Alice"
-        - name: "Bob"
-        - name: "Charlie"
-  - name: "Add a new user"
-    method: "POST"
-    url: "${BASE_URL}/users/name=Dave"
+        - name: Alice     # Strings don't need to be wrapped in quotes
+        - name: Bob     # But they can be, if you want!
+        - name: 'Charlie' # Single quotes are also fine
+  - name: Add a new user
+    method: POST
+    url: ${BASE_URL}/users/name=Dave
     expected_status_code: 200
     request_body:
-      name: "Dave"
-  - name: "Get existing users, check that Dave was added"
-    method: "GET"
-    url: "${BASE_URL}/users"
+      name: Dave
+  - name: Get existing users, check that Dave was added
+    method: GET
+    url: ${BASE_URL}/users
     expected_status_code: 200
     response_includes:
       users:
-        - name: "Dave"
-  - name: "Delete a user"
-    method: "DELETE"
-    url: "${BASE_URL}/users/name=Charlie"
+        - name: Dave
+  - name: Delete a user
+    method: DELETE
+    url: ${BASE_URL}/users/name=Charlie
     expected_status_code: 200
     response_includes:
-      message: "Deleted user Charlie"
-  - name: "Get existing users, check that Charlie was deleted"
-    method: "GET"
-    url: "${BASE_URL}/users"
+      message: Deleted user Charlie
+  - name: Get existing users, check that Charlie was deleted
+    method: GET
+    url: ${BASE_URL}/users
     expected_status_code: 200
     response_includes:
       users:
-        - name: "Alice"
-        - name: "Bob"
-        - name: "Dave"
-  - name: "Try to delete a user that doesn't exist"
-    method: "DELETE"
-    url: "${BASE_URL}/users/name=Charlie"
+        - name: Alice
+        - name: Bob
+        - name: Dave
+  - name: Try to delete a user that doesn't exist
+    method: DELETE
+    url: ${BASE_URL}/users/name=Charlie
     expected_status_code: 404
     response_includes:
-      message: "User Charlie not found"
-  - name: "Check Alice's ID is 0"
-    method: "GET"
-    url: "${BASE_URL}/users/name=Alice"
+      message: User Charlie not found
+  - name: Check Alice's ID is 0
+    method: GET
+    url: ${BASE_URL}/users/name=Alice
     expected_status_code: 200
     extract:
       - name: alice_id
@@ -63,10 +63,10 @@ steps:
     expect:
       - variable: ${alice_id}
         operator: eq
-        value: "0"
-  - name: "Check Bob's ID is NOT 0"
-    method: "GET"
-    url: "${BASE_URL}/users/name=Bob"
+        value: 0
+  - name: Check Bob's ID is NOT 0
+    method: GET
+    url: ${BASE_URL}/users/name=Bob
     expected_status_code: 200
     extract:
       - name: bob_id
@@ -74,5 +74,5 @@ steps:
     expect:
       - variable: ${bob_id}
         operator: ne
-        value: "0"
+        value: 0
 

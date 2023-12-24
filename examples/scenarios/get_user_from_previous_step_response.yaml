@@ -5,32 +5,32 @@ variables:
   BASE_URL: "http://127.0.0.1:2396"
 
 steps:
-  - name: "Reset the server's memory"
-    method: "GET"
-    url: "${BASE_URL}/"
+  - name: Reset the server's memory
+    method: GET
+    url: ${BASE_URL}/
     expected_status_code: 200
-  - name: "Get existing user Alice"
-    method: "GET"
-    url: "${BASE_URL}/users/name=Alice"
+  - name: Get existing user Alice
+    method: GET
+    url: ${BASE_URL}/users/name=Alice
     expected_status_code: 200
     extract:
       - name: alice_id
         from: user.id
-  - name: "Get user Alice by ID"
-    method: "GET"
-    url: "${BASE_URL}/users/id=${alice_id}"
+  - name: Get user Alice by ID
+    method: GET
+    url: ${BASE_URL}/users/id=${alice_id}
     expected_status_code: 200
     response_includes:
       user:
         name: Alice
-  - name: "Echo Alice's ID"
-    method: "POST"
-    url: "${BASE_URL}/echo"
+  - name: Echo Alice's ID
+    method: POST
+    url: ${BASE_URL}/echo
     expected_status_code: 200
     request_body:
-      alice_id: "${alice_id}"
+      alice_id: ${alice_id}
     response_includes:
-      alice_id: "${alice_id}"
+      alice_id: ${alice_id}
     # Alternatively, the output function can be used:
     output:
-      - "Alice's ID is ${alice_id}"
+      - Alice's ID is ${alice_id}

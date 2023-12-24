@@ -18,13 +18,16 @@ def check_response_body_contains(json_data, yaml_data):
     def check_item(json_item, yaml_item):
         if isinstance(yaml_item, dict):
             return all(key in json_item and check_item(json_item[key], value) for key, value in yaml_item.items())
-        elif isinstance(yaml_item, list) and all(isinstance(elem, dict) for elem in yaml_item):
-            # Check if all dictionaries in yaml_item are matched in json_item
-            return all(any(check_item(json_sub_item, yaml_sub_item) for json_sub_item in json_item) for yaml_sub_item in yaml_item)
         elif isinstance(yaml_item, list):
-            return all(item in json_item for item in yaml_item)
+            if all(isinstance(elem, dict) for elem in yaml_item):
+                # For each dict in the yaml list, check if there's at least one matching dict in the json list
+                return all(any(check_item(json_sub_item, yaml_sub_item) for json_sub_item in json_item) for yaml_sub_item in yaml_item)
+            else:
+                # If the list does not contain dicts, check if the yaml list is a subset of the json list
+                return all(item in json_item for item in yaml_item)
         else:
-            return json_item == yaml_item
+            # For non-list, non-dict items, directly compare the values
+            return str(json_item) == str(yaml_item)
 
     def traverse(json_data, yaml_data):
         for key, yaml_value in yaml_data.items():
