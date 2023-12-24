@@ -32,6 +32,8 @@ steps:
     response_includes:
       users:
         - name: Dave
+    response_length:
+      users: 4
   - name: Delete a user
     method: DELETE
     url: ${BASE_URL}/users/name=Charlie

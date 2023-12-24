@@ -187,6 +187,51 @@ With these two assertions, `response_includes` and `response_excludes`, testing 
 
 A practical example of this feature can be seen in [this scenario](https://github.com/RohitKochhar/dasty/tree/main/examples/scenarios/check_response_body.yaml)
 
+
+### `response_length` Function
+
+Dasty introduces the `response_length` function, enabling you to assert the length of specific fields within your API response. This is particularly useful for validating the size of arrays or strings in your response data, ensuring your API behaves as expected in terms of data quantity or size.
+
+**Usage Example**:
+
+To check the number of users returned by the API:
+
+```yaml
+- name: "Get existing users, check the count"
+  method: "GET"
+  url: "${BASE_URL}/users"
+  expected_status_code: 200
+  response_length:
+    users: 4
+```
+
+In this example, the `response_length` check validates that the `users` field in the response contains exactly 4 items. 
+
+This functionality is crucial for scenarios where the quantity of returned data matters, such as checking pagination results or ensuring an API does not return excessive data.
+
+### Practical Use of `response_length`
+
+You can combine `response_length` with other features like `response_includes` to not only validate the presence of certain data but also ensure the response contains the correct number of items.
+
+**Combined Example**:
+
+```yaml
+- name: "Verify user list size and content"
+  method: "GET"
+  url: "${BASE_URL}/users"
+  expected_status_code: 200
+  response_includes:
+    users:
+      - name: "Alice"
+  response_length:
+    users: 4
+```
+
+In this scenario, Dasty checks that the `users` array includes a user named "Alice" and also asserts that the total number of users in the array is 4.
+
+With `response_length`, your testing becomes more robust, allowing you to enforce not just the quality but also the quantity of the data returned by your API.
+
+
 ### `output` Function
 
 Dasty also introduces an output function, enabling you to print values extracted from a response or any dynamic variable within the scenario. This feature is especially useful for debugging or when you need to log specific information.
@@ -216,7 +261,7 @@ Results in:
 This feature enhances the debugging capabilities within your testing scenarios, making it easier to trace and understand the flow of data.
 
 
-### Feature: Variable Value Assertions
+### Variable Value Assertions
 
 ### `expect` Function
 

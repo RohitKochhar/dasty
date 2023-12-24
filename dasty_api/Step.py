@@ -2,7 +2,7 @@
 # Standard library imports
 import requests # type: ignore
 # Local application imports
-from .utils import check_response_body_contains, replace_variables
+from .utils import check_response_body_contains, replace_variables, check_response_length
 
 # Classes ---------------------------------------------------------------------
 class Step:
@@ -17,6 +17,7 @@ class Step:
             headers: dict = None,
             response_includes: dict = None, 
             response_excludes: dict = None,
+            response_length: dict = None,
             request_body: dict = None, 
             extract: list = None,
             output: list = None,
@@ -35,6 +36,7 @@ class Step:
         self.request_body = request_body
         self.response_includes = response_includes
         self.response_excludes = response_excludes
+        self.response_length = response_length
         self.extract = extract
         self.output = output
         self.expect = expect
@@ -80,6 +82,12 @@ class Step:
             formatted_response_excludes = replace_variables(self.response_excludes, variables)
             response_json = response.json()
             assert not check_response_body_contains(response_json, formatted_response_excludes), f'Error during \"{self.name}\" step:\nResponse: \n{response_json}\n Contains: \n{formatted_response_excludes}'
+
+        # Replace variables in response_length and perform the check
+        if self.response_length is not None:
+            formatted_response_length = replace_variables(self.response_length, variables)
+            response_json = response.json()
+            assert check_response_length(response_json, formatted_response_length), f'Error during "{self.name}" step:\nResponse length mismatch in: \n{response_json}\nExpected lengths: \n{formatted_response_length}'
 
         # Save response values into variables if specified
         if self.extract:
