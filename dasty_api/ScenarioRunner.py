@@ -1,47 +1,48 @@
 # Imports ---------------------------------------------------------------------
 # Standard library imports
 from pathlib import Path
-# Local application imports
+# Local imports
 from .YAMLScenario import YAMLScenario
 
-# ScenarioRunner class -----------------------------------------------------------
-class ScenarioRunner():
-    def __init__(self, directory_name, tags=None, **kwargs):
-        self.get_directory(directory_name)
+class ScenarioRunner:
+    def __init__(self, directory_name: str, tags=None, **kwargs):
+        self.directory = self._get_directory(directory_name)
         self.tags = tags
         self.kwargs = kwargs
 
-    def get_directory(self, directory_name):
+    def _get_directory(self, directory_name: str) -> Path:
         """
-        Checks if the directory exists
+        Verifies if the directory exists and returns a Path object.
         """
-        if not Path(directory_name).exists():
-            raise Exception(f"Directory {directory_name} does not exist")
-        else:
-            self.directory = Path(directory_name)
+        directory_path = Path(directory_name)
+        if not directory_path.exists():
+            raise FileNotFoundError(f"Directory {directory_name} does not exist")
+        return directory_path
 
-    def collect_scenarios(self):
+    def _collect_scenarios(self) -> list:
         """
-        Collects all the scenarios in the directory
+        Collects all the YAML scenarios in the directory.
         """
-        scenario_filepaths = [str(path) for path in self.directory.glob("*.yaml")]
-        self.scenarios = [YAMLScenario(filepath=filepath) for filepath in scenario_filepaths]
+        scenario_filepaths = self.directory.glob("*.yaml")
+        return [YAMLScenario(filepath=str(filepath)) for filepath in scenario_filepaths]
 
     def run(self):
         """
-        Runs all the scenarios in the directory
+        Runs all the scenarios in the directory.
         """
-        self.collect_scenarios()
-        for scenario in self.scenarios:
-            if "ignore" in scenario.tags:
-                print(f"Skipping scenario {scenario.name} because it has the tag 'ignore'")
-                continue
-            # If no tag was specified for the runner, run all tests
-            if self.tags is None:
+        scenarios = self._collect_scenarios()
+        for scenario in scenarios:
+            if self._should_run_scenario(scenario):
                 scenario.run()
-            else:
-                # If tags were provided, check if the scenario has any of them
-                if any(tag in scenario.tags for tag in self.tags):
-                    scenario.run()
-                else:
-                    print(f"Skipping scenario {scenario.name} because it does not have any of the tags {self.tags}")
+
+    def _should_run_scenario(self, scenario: YAMLScenario) -> bool:
+        """
+        Determines if a scenario should be run based on its tags.
+        """
+        if "ignore" in scenario.tags:
+            print(f"Skipping scenario {scenario.name} due to 'ignore' tag.")
+            return False
+        if self.tags is None or any(tag in scenario.tags for tag in self.tags):
+            return True
+        print(f"Skipping scenario {scenario.name}; it lacks the required tags {self.tags}.")
+        return False
