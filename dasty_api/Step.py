@@ -1,4 +1,3 @@
-# Imports ---------------------------------------------------------------------
 import requests # type: ignore
 from .utils import check_response_body_contains, replace_variables, check_response_length
 

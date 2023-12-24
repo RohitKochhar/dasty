@@ -1,7 +1,4 @@
-# Imports ---------------------------------------------------------------------
-# Standard library imports
 from pathlib import Path
-# Local imports
 from .YAMLScenario import YAMLScenario
 
 # ScenarioRunner class ---------------------------------------------------------

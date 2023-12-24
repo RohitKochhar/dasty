@@ -1,6 +1,3 @@
-# Imports ---------------------------------------------------------------------
-# Standard library imports
-import json
 import re
 
 def check_response_body_contains(json_data: dict, yaml_data: dict) -> bool:

@@ -1,7 +1,4 @@
-# Imports ---------------------------------------------------------------------
-# Standard library imports
 import yaml # type: ignore
-# Local application imports
 from .Step import Step
 
 # YAMLScenario class -----------------------------------------------------------
