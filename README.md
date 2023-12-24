@@ -45,7 +45,7 @@ pip install -r requirements.txt
 python3 simple_server.py
 ```
 
-3. Run the ScenarioRunner
+3. In a new terminal, run the ScenarioRunner
 
 ```bash
 python3 scenario_runner.py
@@ -140,3 +140,49 @@ steps:
     method: "GET"
     url: "${BASE_URL}/users/id=${user_id}"
 ```
+
+### Response Validation Assertions
+
+Dasty supports a variety of response assertion features to validate API response content.
+
+#### `response_includes`
+
+This assertion ensures specific content is included in the API response. It's essential for verifying the presence of expected data elements. For instance, to confirm that a user object is part of the response, `response_includes` can be used to assert its existence.
+
+**Usage Example**:
+
+```yaml
+- name: "Check user presence"
+  method: "GET"
+  url: "${BASE_URL}/users"
+  expected_status_code: 200
+  response_includes:
+    users:
+      - name: "Alice"
+```
+
+In this example, `response_includes` will validate that within the `users` array of the response, there is an entry with the `name` attribute equal to "Alice".
+
+A practical example of this feature can be seen in [this scenario](https://github.com/RohitKochhar/dasty/tree/main/examples/scenarios/check_response_body.yaml)
+
+#### `response_excludes`
+
+Conversely, this assertion ensures that certain content is definitively absent from the response. It is invaluable for confirming that sensitive data is not exposed or to ensure that an entity has been properly removed or is not present.
+
+**Usage Example**:
+
+```yaml
+- name: "Validate user absence"
+  method: "GET"
+  url: "${BASE_URL}/users"
+  expected_status_code: 200
+  response_excludes:
+    users:
+      - name: "Alice"
+```
+
+The `response_excludes` assertion checks that the `users` array in the response does not contain any object with a `name` attribute equal to "Alice".
+
+With these two assertions, `response_includes` and `response_excludes`, testing for both the presence and absence of data in your API responses becomes straightforward and clear, providing a robust method for validating the state and security of your API endpoints.
+
+A practical example of this feature can be seen in [this scenario](https://github.com/RohitKochhar/dasty/tree/main/examples/scenarios/check_response_body.yaml)
