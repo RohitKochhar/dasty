@@ -110,8 +110,8 @@ class Step:
                 operator = expectation['operator']
                 value = replace_variables(expectation['value'], variables)
                 if operator == 'eq':
-                    assert variable == value, f'Error during \"{self.name}\" step:\nExpected {variable_name} to be equal to {value}, instead got {variable}'
+                    assert str(variable) == str(value), f'Error during \"{self.name}\" step:\nExpected {variable_name} to be equal to {value}, instead got {variable}'
                 if operator == 'ne':
-                    assert variable != value, f'Error during \"{self.name}\" step:\nExpected {variable_name} to be not equal to {value}, instead got {variable}'
+                    assert str(variable) != str(value), f'Error during \"{self.name}\" step:\nExpected {variable_name} to be not equal to {value}, instead got {variable}'
 
         return variables

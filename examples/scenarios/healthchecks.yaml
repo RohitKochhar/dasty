@@ -1,14 +1,14 @@
 name: "Sample Service: Health Checks"
 description:
-  - "Health checks for the sample service"
+  - Health checks for the sample service
 variables:
-  BASE_URL: "http://127.0.0.1:2396"
+  BASE_URL: http://127.0.0.1:2396
 steps:
-  - name: "Health Check"
-    method: "GET"
-    url: "${BASE_URL}/healthz"
+  - name: Health Check
+    method: GET
+    url: ${BASE_URL}/healthz
     expected_status_code: 200
-  - name: "Readiness Check"
-    method: "GET"
-    url: "${BASE_URL}/readyz"
+  - name: Readiness Check
+    method: GET
+    url: ${BASE_URL}/readyz
     expected_status_code: 200
