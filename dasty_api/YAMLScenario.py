@@ -10,7 +10,8 @@ class YAMLScenario:
         self.filepath = filepath
         with open(filepath, 'r') as f:
             yaml_content = yaml.safe_load(f)
-        
+        if yaml_content is None:
+            raise ValueError(f"File {filepath} is empty")
         self.variables = yaml_content.get('variables', {})
         self.name = yaml_content['name']
         self.description = yaml_content['description']
