@@ -1,4 +1,5 @@
 import re
+from time import time as get_current_time
 
 def check_response_body_contains(json_data: dict, yaml_data: dict) -> bool:
     """
@@ -78,3 +79,7 @@ def check_response_length(json_data: dict, response_length_spec: dict) -> bool:
         assert actual_length == expected_length, \
             f"Length of '{field}' is {actual_length}, expected {expected_length}."
     return True
+
+def format_time_message(start_time):
+    end_time = get_current_time()
+    return f" ({(end_time - start_time)*1000:.2f}ms)"
