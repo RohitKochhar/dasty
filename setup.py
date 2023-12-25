@@ -23,7 +23,8 @@ setup(
         'idna==3.6',
         'PyYAML==6.0.1',
         'requests==2.31.0',
-        'urllib3==2.1.0'
+        'urllib3==2.1.0',
+        'tabulate==0.9.0',
     ],
     classifiers=[
         'Programming Language :: Python :: 3',

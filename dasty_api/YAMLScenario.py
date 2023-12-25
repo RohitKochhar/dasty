@@ -15,16 +15,16 @@ class YAMLScenario:
         """
         self.filepath = filepath
         with open(filepath, 'r') as file:
-            yaml_content = yaml.safe_load(file)
+            self.yaml_content = yaml.safe_load(file)
 
-        if not yaml_content:
+        if not self.yaml_content:
             raise ValueError(f"File {filepath} is empty or invalid YAML.")
 
-        self.name = yaml_content.get('name')
-        self.description = yaml_content.get('description')
-        self.tags = yaml_content.get('tags', [])
-        self.variables = yaml_content.get('variables', {})
-        self.steps = [Step(**step) for step in yaml_content.get('steps', [])]
+        self.name = self.yaml_content.get('name')
+        self.description = self.yaml_content.get('description')
+        self.tags = self.yaml_content.get('tags', [])
+        self.variables = self.yaml_content.get('variables', {})
+        self.steps = [Step(**step) for step in self.yaml_content.get('steps', [])]
 
         self._validate_scenario()
 
@@ -36,8 +36,8 @@ class YAMLScenario:
         def run_steps():
             for step in self.steps:
                 self.variables = step(self.variables)
-        _, time_message = measure_time(run_steps)
-        print("\033[92m" + f"{self.name} Success ✅ {time_message}\033[0m")
+        _, time_ms = measure_time(run_steps)
+        print("\033[92m" + f"{self.name} Success ✅ ({time_ms}ms)\033[0m")
 
     def _validate_scenario(self) -> None:
         """

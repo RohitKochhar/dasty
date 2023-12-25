@@ -49,9 +49,9 @@ class Step:
         """
         print(f"\tRunning step {self.name}...", end="")
         self._prepare_request(variables)
-        response, time_message = measure_time(self._make_request)
+        response, time_ms = measure_time(self._make_request)
         self._validate_response(response, variables)
-        print("\033[92m Success ✅" + (time_message) + "\033[0m")
+        print(f"\033[92m Success ✅ ({time_ms}ms)\033[0m")
         return variables
 
     def _prepare_request(self, variables):
