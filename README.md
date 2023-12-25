@@ -356,3 +356,50 @@ With tag-based scenario execution, Dasty provides a more dynamic and controlled 
 ### HTTP Call Timing Feature
 
 Dasty includes the capability to measure and display the execution time for each HTTP call within your test scenarios. This feature is instrumental in identifying performance bottlenecks and ensuring that your API responses are within acceptable time limits.
+
+### Benchmarking
+
+Dasty includes a powerful benchmarking feature that allows you to measure the performance of your API scenarios. This feature is especially useful for identifying performance bottlenecks and ensuring your APIs meet their performance goals.
+
+#### How to Use the Benchmarking Feature
+
+To use the benchmarking feature, simply run your scenarios with the `Benchmarker` instead of the standard `ScenarioRunner`. Specify the directory containing your YAML scenario files as an argument:
+
+```python
+from dasty import Benchmarker
+
+benchmarker = Benchmarker(directory="path/to/your/scenarios")
+benchmarker.run()
+```
+
+#### Output
+
+When you run scenarios with the `Benchmarker`, you'll get a detailed output that includes the following information for each API call:
+
+- **METHOD**: The HTTP method used (GET, POST, etc.).
+- **URL**: The URL of the API endpoint.
+- **TIME (ms)**: The time taken to execute the API call in milliseconds.
+- **REQUEST SIZE (bytes)**: The size of the request payload in bytes.
+- **RESPONSE SIZE (bytes)**: The size of the response payload in bytes.
+
+#### Example Output
+
+```
+Add, Get, and Delete Users
+--------------------------
+METHOD    URL                                         TIME (ms)    REQUEST SIZE (bytes)    RESPONSE SIZE (bytes)
+--------  ----------------------------------------  -----------  ----------------------  -----------------------
+GET       http://127.0.0.1:2396/                           2.09                       0                        2
+GET       http://127.0.0.1:2396/users                      1.45                       0                       84
+... (additional rows of data) ...
+```
+
+#### Interpreting the Results
+
+The benchmarking output helps you understand the performance characteristics of each API call in your scenario. Look for API calls with high response times or payload sizes that might indicate performance issues. This data is invaluable for optimizing your APIs and ensuring they perform efficiently under different conditions.
+
+#### Tips for Effective Benchmarking
+
+- **Run in a Controlled Environment**: For consistent results, run your benchmarks in a stable and controlled environment.
+- **Compare Over Time**: Regularly benchmarking your APIs can help you spot performance regressions or improvements over time.
+- **Consider Network Conditions**: Remember that network conditions can affect benchmark results. Consider this when analyzing performance, especially if benchmarking over public networks.
