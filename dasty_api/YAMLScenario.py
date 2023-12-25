@@ -1,7 +1,6 @@
 import yaml # type: ignore
-from time import time as get_current_time
 from .Step import Step
-from .utils import format_time_message
+from .utils import measure_time
 
 class YAMLScenario:
     def __init__(self, filepath: str) -> None:
@@ -29,19 +28,16 @@ class YAMLScenario:
 
         self._validate_scenario()
 
-    def run(self, time) -> None:
+    def run(self) -> None:
         """
         Executes all the steps defined in the scenario.
         """
-        time_message = ""
-        if time:
-            start_time = get_current_time()
         print(f"Running scenario {self.name} defined in {self.filepath}...")
-        for step in self.steps:
-            self.variables = step(self.variables, time=time)
-        if time:
-            time_message = format_time_message(start_time)
-        print("\033[92m" + f"{self.name} Success ✅" + time_message + "\033[0m")
+        def run_steps():
+            for step in self.steps:
+                self.variables = step(self.variables)
+        _, time_message = measure_time(run_steps)
+        print("\033[92m" + f"{self.name} Success ✅ {time_message}\033[0m")
 
     def _validate_scenario(self) -> None:
         """
