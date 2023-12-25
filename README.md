@@ -55,18 +55,16 @@ python3 scenario_runner.py
 
 ```
 Running scenario Add, Get, and Delete Users defined in examples/scenarios/add_get_delete_users.yaml...
-        Running step Reset the server's memory... Success ✅
-        Running step Get existing users... Success ✅
-        Running step Add a new user... Success ✅
-        Running step Get existing users, check that Dave was added... Success ✅
-        Running step Delete a user... Success ✅
-        Running step Get existing users, check that Charlie was deleted... Success ✅
-        Running step Try to delete a user that doesn't exist... Success ✅
+        Running step Reset the server's memory... Success ✅ (6.90ms)
+        Running step Get existing users... Success ✅ (2.02ms)
+        Running step Add a new user... Success ✅ (1.70ms)
+        Running step Get existing users, check that Dave was added... Success ✅ (1.83ms)
+        Running step Delete a user... Success ✅ (1.80ms)
+        Running step Get existing users, check that Charlie was deleted... Success ✅ (1.65ms)
+        Running step Try to delete a user that doesn't exist... Success ✅ (1.98ms)
+        Running step Check Alice's ID is 0... Success ✅ (1.87ms)
+        Running step Check Bob's ID is NOT 0... Success ✅ (1.79ms)
 Add, Get, and Delete Users Success ✅
-Running scenario Sample Service: Health Checks defined in examples/scenarios/healthchecks.yaml...
-        Running step Health Check... Success ✅
-        Running step Readiness Check... Success ✅
-Sample Service: Health Checks Success ✅
 ```
 
 ### Using dasty in your project
@@ -116,10 +114,10 @@ Once `main.py` is executed, the output should look as follows:
 
 ```
 ╰─ python3 main.py                                              
-Running scenario Users Service: Health Checks defined in scenarios/healthcheck_users.yaml...
-        Running step Health Check... Success ✅
-        Running step Readiness Check... Success ✅
-Users Service: Health Checks Success ✅
+Running scenario Sample Service: Health Checks defined in examples/scenarios/healthchecks.yaml...
+        Running step Health Check... Success ✅ (1.51ms)
+        Running step Readiness Check... Success ✅ (1.51ms)
+Sample Service: Health Checks Success ✅
 ```
 
 ## Features
@@ -359,36 +357,49 @@ With tag-based scenario execution, Dasty provides a more dynamic and controlled 
 
 Dasty includes the capability to measure and display the execution time for each HTTP call within your test scenarios. This feature is instrumental in identifying performance bottlenecks and ensuring that your API responses are within acceptable time limits.
 
-#### Enabling Timing Feature
+### Benchmarking
 
-To enable this feature, initialize the `ScenarioRunner` with the `time` parameter set to `True`. This instructs Dasty to record the execution time for each step of your scenarios.
+Dasty includes a powerful benchmarking feature that allows you to measure the performance of your API scenarios. This feature is especially useful for identifying performance bottlenecks and ensuring your APIs meet their performance goals.
 
-**Example:**
+#### How to Use the Benchmarking Feature
+
+To use the benchmarking feature, simply run your scenarios with the `Benchmarker` instead of the standard `ScenarioRunner`. Specify the directory containing your YAML scenario files as an argument:
+
 ```python
-from dasty_api.ScenarioRunner import ScenarioRunner
+from dasty import Benchmarker
 
-runner = ScenarioRunner("./examples/scenarios", time=True)
-runner.run()
+benchmarker = Benchmarker(directory="path/to/your/scenarios")
+benchmarker.run()
 ```
 
-Note that by default, if no `time` parameter is passed, timing functionality will be turned off.
+#### Output
 
-**Sample Output:**
+When you run scenarios with the `Benchmarker`, you'll get a detailed output that includes the following information for each API call:
+
+- **METHOD**: The HTTP method used (GET, POST, etc.).
+- **URL**: The URL of the API endpoint.
+- **TIME (ms)**: The time taken to execute the API call in milliseconds.
+- **REQUEST SIZE (bytes)**: The size of the request payload in bytes.
+- **RESPONSE SIZE (bytes)**: The size of the response payload in bytes.
+
+#### Example Output
+
 ```
-Running scenario Add, Get, and Delete Users defined in examples/scenarios/add_get_delete_users.yaml...
-        Running step Reset the server's memory... Success ✅ (6.33ms)
-        Running step Get existing users... Success ✅ (1.96ms)
-        ...
-        Running step Check Bob's ID is NOT 0... Success ✅ (1.50ms)
-Add, Get, and Delete Users Success ✅ (21.11ms)
+Add, Get, and Delete Users
+--------------------------
+METHOD    URL                                         TIME (ms)    REQUEST SIZE (bytes)    RESPONSE SIZE (bytes)
+--------  ----------------------------------------  -----------  ----------------------  -----------------------
+GET       http://127.0.0.1:2396/                           2.09                       0                        2
+GET       http://127.0.0.1:2396/users                      1.45                       0                       84
+... (additional rows of data) ...
 ```
 
-In this example, each step in the scenario shows how long it took to execute, giving you a clear picture of the performance of each API call.
+#### Interpreting the Results
 
-#### Analyzing Performance
+The benchmarking output helps you understand the performance characteristics of each API call in your scenario. Look for API calls with high response times or payload sizes that might indicate performance issues. This data is invaluable for optimizing your APIs and ensuring they perform efficiently under different conditions.
 
-This timing feature is particularly useful for:
+#### Tips for Effective Benchmarking
 
-- **Performance Testing**: Quickly identify slow API calls that may need optimization.
-- **Regression Testing**: Ensure that changes in your codebase have not adversely affected the performance of your APIs.
-- **Continuous Integration**: Include performance metrics in your continuous testing pipeline to monitor API performance over time.
+- **Run in a Controlled Environment**: For consistent results, run your benchmarks in a stable and controlled environment.
+- **Compare Over Time**: Regularly benchmarking your APIs can help you spot performance regressions or improvements over time.
+- **Consider Network Conditions**: Remember that network conditions can affect benchmark results. Consider this when analyzing performance, especially if benchmarking over public networks.

@@ -80,6 +80,9 @@ def check_response_length(json_data: dict, response_length_spec: dict) -> bool:
             f"Length of '{field}' is {actual_length}, expected {expected_length}."
     return True
 
-def format_time_message(start_time):
+def measure_time(func):
+    start_time = get_current_time()
+    response = func()
     end_time = get_current_time()
-    return f" ({(end_time - start_time)*1000:.2f}ms)"
+    time_ms = f"{(end_time - start_time)*1000:.2f}"
+    return response, time_ms

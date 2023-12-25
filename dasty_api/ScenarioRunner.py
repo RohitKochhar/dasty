@@ -1,8 +1,8 @@
 from pathlib import Path
-from .YAMLScenario import YAMLScenario
+from .Scenario import Scenario
 
 class ScenarioRunner:
-    def __init__(self, directory_name: str, tags=None, time=False, **kwargs):
+    def __init__(self, directory_name: str, tags=None, **kwargs):
         """
         Initializes the ScenarioRunner with a specific directory and optional tags.
 
@@ -13,7 +13,6 @@ class ScenarioRunner:
         """
         self.directory = self._get_directory(directory_name)
         self.tags = tags
-        self.time = time
         self.kwargs = kwargs
 
     def _get_directory(self, directory_name: str) -> Path:
@@ -39,10 +38,10 @@ class ScenarioRunner:
         Collects all the YAML scenarios in the directory and returns them.
 
         Returns:
-            list: A list of YAMLScenario objects representing the scenarios found.
+            list: A list of Scenario objects representing the scenarios found.
         """
         scenario_filepaths = self.directory.glob("*.yaml")
-        return [YAMLScenario(filepath=str(filepath)) for filepath in scenario_filepaths]
+        return [Scenario(filepath=str(filepath)) for filepath in scenario_filepaths]
 
     def run(self):
         """
@@ -51,14 +50,14 @@ class ScenarioRunner:
         scenarios = self._collect_scenarios()
         for scenario in scenarios:
             if self._should_run_scenario(scenario):
-                scenario.run(time=self.time)
+                scenario.run()
 
-    def _should_run_scenario(self, scenario: YAMLScenario) -> bool:
+    def _should_run_scenario(self, scenario: Scenario) -> bool:
         """
         Collects all the YAML scenarios in the directory and returns them.
 
         Returns:
-            list: A list of YAMLScenario objects representing the scenarios found.
+            list: A list of Scenario objects representing the scenarios found.
         """
         if "ignore" in scenario.tags:
             print(f"Skipping scenario {scenario.name} due to 'ignore' tag.")

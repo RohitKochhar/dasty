@@ -1,6 +1,5 @@
 import requests # type: ignore
-from .utils import check_response_body_contains, replace_variables, check_response_length, format_time_message
-from time import time as get_current_time
+from .utils import check_response_body_contains, replace_variables, check_response_length, measure_time
 
 class Step:
     def __init__(self, name: str, method: str, url: str, expected_status_code: int,
@@ -38,7 +37,7 @@ class Step:
         self.output = output
         self.expect = expect
 
-    def __call__(self, variables, time=False) -> dict:
+    def __call__(self, variables) -> dict:
         """
         Executes the step by preparing the request, making the request, and validating the response.
 
@@ -50,12 +49,9 @@ class Step:
         """
         print(f"\tRunning step {self.name}...", end="")
         self._prepare_request(variables)
-        start_time = get_current_time() if time else None
-        response = self._make_request()
-        if time:
-            time_message = format_time_message(start_time)
+        response, time_ms = measure_time(self._make_request)
         self._validate_response(response, variables)
-        print("\033[92m Success ✅" + (time_message if time else "") + "\033[0m")
+        print(f"\033[92m Success ✅ ({time_ms}ms)\033[0m")
         return variables
 
     def _prepare_request(self, variables):
@@ -154,7 +150,7 @@ class Step:
             print("\n\t\tOutputs:")
             for output_line in self.output:
                 formatted_output = replace_variables(output_line, variables)
-                print(f"\t\t- {formatted_output}")
+                print(f"\t\t- {formatted_output}.", end="")
 
     def _get_value_from_path(self, data, path):
         """
