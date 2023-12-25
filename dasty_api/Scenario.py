@@ -2,10 +2,10 @@ import yaml # type: ignore
 from .Step import Step
 from .utils import measure_time
 
-class YAMLScenario:
+class Scenario:
     def __init__(self, filepath: str) -> None:
         """
-        Initializes a YAMLScenario object by loading and parsing a YAML file.
+        Initializes a Scenario object by loading and parsing a YAML file.
 
         Args:
             filepath (str): The path to the YAML file containing the scenario definition.

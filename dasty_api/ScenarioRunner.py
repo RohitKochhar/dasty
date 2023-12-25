@@ -1,5 +1,5 @@
 from pathlib import Path
-from .YAMLScenario import YAMLScenario
+from .Scenario import Scenario
 
 class ScenarioRunner:
     def __init__(self, directory_name: str, tags=None, **kwargs):
@@ -38,10 +38,10 @@ class ScenarioRunner:
         Collects all the YAML scenarios in the directory and returns them.
 
         Returns:
-            list: A list of YAMLScenario objects representing the scenarios found.
+            list: A list of Scenario objects representing the scenarios found.
         """
         scenario_filepaths = self.directory.glob("*.yaml")
-        return [YAMLScenario(filepath=str(filepath)) for filepath in scenario_filepaths]
+        return [Scenario(filepath=str(filepath)) for filepath in scenario_filepaths]
 
     def run(self):
         """
@@ -52,12 +52,12 @@ class ScenarioRunner:
             if self._should_run_scenario(scenario):
                 scenario.run()
 
-    def _should_run_scenario(self, scenario: YAMLScenario) -> bool:
+    def _should_run_scenario(self, scenario: Scenario) -> bool:
         """
         Collects all the YAML scenarios in the directory and returns them.
 
         Returns:
-            list: A list of YAMLScenario objects representing the scenarios found.
+            list: A list of Scenario objects representing the scenarios found.
         """
         if "ignore" in scenario.tags:
             print(f"Skipping scenario {scenario.name} due to 'ignore' tag.")

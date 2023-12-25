@@ -1,8 +1,8 @@
-from ..YAMLScenario import YAMLScenario
+from ..Scenario import Scenario
 from .BenchmarkerStep import BenchmarkerStep
 from tabulate import tabulate # type: ignore
 
-class BenchmarkingScenario(YAMLScenario):
+class BenchmarkingScenario(Scenario):
     def __init__(self, filepath: str) -> None:
         """
         Initializes a BenchmarkingScenario object by loading and parsing a YAML file.
