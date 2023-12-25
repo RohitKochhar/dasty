@@ -2,7 +2,7 @@ from pathlib import Path
 from .YAMLScenario import YAMLScenario
 
 class ScenarioRunner:
-    def __init__(self, directory_name: str, tags=None, **kwargs):
+    def __init__(self, directory_name: str, tags=None, time=False, **kwargs):
         """
         Initializes the ScenarioRunner with a specific directory and optional tags.
 
@@ -13,6 +13,7 @@ class ScenarioRunner:
         """
         self.directory = self._get_directory(directory_name)
         self.tags = tags
+        self.time = time
         self.kwargs = kwargs
 
     def _get_directory(self, directory_name: str) -> Path:
@@ -50,7 +51,7 @@ class ScenarioRunner:
         scenarios = self._collect_scenarios()
         for scenario in scenarios:
             if self._should_run_scenario(scenario):
-                scenario.run()
+                scenario.run(time=self.time)
 
     def _should_run_scenario(self, scenario: YAMLScenario) -> bool:
         """

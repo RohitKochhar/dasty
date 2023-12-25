@@ -353,4 +353,42 @@ tags:
 ```
 
 With tag-based scenario execution, Dasty provides a more dynamic and controlled testing environment, allowing you to focus on specific areas of your application as needed.
+
+
+### HTTP Call Timing Feature
+
+Dasty includes the capability to measure and display the execution time for each HTTP call within your test scenarios. This feature is instrumental in identifying performance bottlenecks and ensuring that your API responses are within acceptable time limits.
+
+#### Enabling Timing Feature
+
+To enable this feature, initialize the `ScenarioRunner` with the `time` parameter set to `True`. This instructs Dasty to record the execution time for each step of your scenarios.
+
+**Example:**
+```python
+from dasty_api.ScenarioRunner import ScenarioRunner
+
+runner = ScenarioRunner("./examples/scenarios", time=True)
+runner.run()
 ```
+
+Note that by default, if no `time` parameter is passed, timing functionality will be turned off.
+
+**Sample Output:**
+```
+Running scenario Add, Get, and Delete Users defined in examples/scenarios/add_get_delete_users.yaml...
+        Running step Reset the server's memory... Success ✅ (6.33ms)
+        Running step Get existing users... Success ✅ (1.96ms)
+        ...
+        Running step Check Bob's ID is NOT 0... Success ✅ (1.50ms)
+Add, Get, and Delete Users Success ✅ (21.11ms)
+```
+
+In this example, each step in the scenario shows how long it took to execute, giving you a clear picture of the performance of each API call.
+
+#### Analyzing Performance
+
+This timing feature is particularly useful for:
+
+- **Performance Testing**: Quickly identify slow API calls that may need optimization.
+- **Regression Testing**: Ensure that changes in your codebase have not adversely affected the performance of your APIs.
+- **Continuous Integration**: Include performance metrics in your continuous testing pipeline to monitor API performance over time.
