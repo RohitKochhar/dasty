@@ -25,22 +25,85 @@ Dasty allows you to define API tests declaratively in YAML format. This approach
 
 ## 2. Benchmarking
 
-The benchmarking feature provides performance metrics for each API call in your scenarios, including response time and payload sizes.
+The Benchmarking feature provides performance metrics for each API call in your scenarios, including response time and payload sizes. You can specify the output format (`json`, `yaml`, `csv`, or `table`) to tailor the presentation of these metrics.
 
 ### Example Usage:
 
 ```python
 from dasty import Benchmarker
 
-benchmarker = Benchmarker(directory="path/to/your/scenarios")
+# Specifying the output format as an optional parameter. Default is 'table'.
+benchmarker = Benchmarker(directory="path/to/your/scenarios", output="json")
 benchmarker.run()
 ```
+
+### Output Formats:
+
+- `table` (default): Displays the data in a table format.
+- `csv`: Outputs the data in CSV format.
+- `json`: Formats the data as a JSON object.
+- `yaml`: Presents the data in YAML format.
 
 ### Output Metrics:
 
 - **Time (ms)**: Execution time of each request.
 - **Request Size (bytes)**: Size of the request payload.
 - **Response Size (bytes)**: Size of the response payload.
+
+### Sample Outputs:
+
+**Table Output:**
+
+```
+Sample Service: Health Checks
+-----------------------------
+method    url                              time_ms    request_size    response_size
+--------  -----------------------------  ---------  --------------  ---------------
+GET       http://127.0.0.1:2396/healthz       1.51               0                2
+GET       http://127.0.0.1:2396/readyz        1.58               0                2
+```
+
+**CSV Output:**
+
+```
+Scenario,"Add, Get, and Delete Users"
+method,url,time_ms,request_size,response_size
+GET,http://127.0.0.1:2396/,2.23,0,2
+GET,http://127.0.0.1:2396/users,1.58,0,84
+...
+```
+
+**JSON Output:**
+
+```json
+{
+    "scenario_name": "Add, Get, and Delete Users",
+    "stats": [
+        {
+            "method": "GET",
+            "url": "http://127.0.0.1:2396/",
+            "time_ms": "2.17",
+            "request_size": 0,
+            "response_size": 2
+        },
+        ...
+    ]
+}
+```
+
+**YAML Output:**
+
+```yaml
+scenario_name: Add, Get, and Delete Users
+stats:
+- method: GET
+  url: http://127.0.0.1:2396/
+  time_ms: '2.08'
+  request_size: 0
+  response_size: 2
+- method: GET
+  ...
+```
 
 ## 3. Flexible Test Scenarios
 
