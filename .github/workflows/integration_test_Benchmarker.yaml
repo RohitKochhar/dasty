@@ -1,4 +1,4 @@
-name: Test Benchmarker class
+name: "Integration Test: Benchmarkers"
 
 on:
   push:

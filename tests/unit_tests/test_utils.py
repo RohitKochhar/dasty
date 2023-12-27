@@ -1,10 +1,7 @@
-# Imports ---------------------------------------------------------------------
-# Standard library imports
 import unittest
-# Local application imports
-from dasty_api.utils import check_response_body_contains, replace_variables, replace_variables_in_string
+from unittest.mock import patch
+import dasty_api.utils as utils
 
-# Tests -----------------------------------------------------------------------
 class TestCheckResponseBodyIncludes(unittest.TestCase):
     def test_response_body_includes(self):
         test_cases = [
@@ -56,7 +53,7 @@ class TestCheckResponseBodyIncludes(unittest.TestCase):
             print(f"\t{test_case['name']}...", end="")
             with self.subTest(test_case['name']):
                 try:
-                    self.assertEqual(check_response_body_contains(test_case['json_data'], test_case['yaml_data']), test_case['expected'])
+                    self.assertEqual(utils.check_response_body_contains(test_case['json_data'], test_case['yaml_data']), test_case['expected'])
                     print("\033[92m" + " Success ✅" + "\033[0m")
                 except AssertionError as e:
                     print("\033[91m" + " Failed ❌" + "\033[0m")
@@ -100,7 +97,7 @@ class TestVariableReplacement(unittest.TestCase):
             print(f"\t{test_case['name']}...", end="")
             with self.subTest(test_case['name']):
                 try:
-                    result = replace_variables(test_case['content'], test_case['variables'])
+                    result = utils.replace_variables(test_case['content'], test_case['variables'])
                     self.assertEqual(result, test_case['expected'])
                     print("\033[92m" + " Success ✅" + "\033[0m")
                 except AssertionError as e:
@@ -138,11 +135,75 @@ class TestVariableReplacement(unittest.TestCase):
             print(f"\t{test_case['name']}...", end="")
             with self.subTest(test_case['name']):
                 try:
-                    result = replace_variables(test_case['content'], test_case['variables'])
+                    result = utils.replace_variables(test_case['content'], test_case['variables'])
                     self.assertEqual(result, test_case['expected'])
                     print("\033[92m" + " Success ✅" + "\033[0m")
                 except AssertionError as e:
                     print("\033[91m" + " Failed ❌" + "\033[0m")
+
+class TestCheckResponseLength(unittest.TestCase):
+    def test_check_response_length(self):
+        test_cases = [
+            {
+                'name': 'Length matches specification',
+                'json_data': {'name': 'John', 'age': '30'},
+                'length_spec': {'name': 4, 'age': 2},
+                'expected': True,
+                'expected_exception': None
+            },
+            {
+                'name': 'Length does not match specification',
+                'json_data': {'name': 'John', 'age': '30'},
+                'length_spec': {'name': 5, 'age': 2},
+                'expected': False,
+                'expected_exception': AssertionError
+            },
+            {
+                'name': 'Field missing in json data',
+                'json_data': {'name': 'John'},
+                'length_spec': {'name': 4, 'age': 2},
+                'expected': None,
+                'expected_exception': ValueError
+            }
+        ]
+
+        print("Testing check_response_length...")
+        for test_case in test_cases:
+            print(f"\t{test_case['name']}...", end="")
+            with self.subTest(test_case['name']):
+                if test_case['expected_exception']:
+                    with self.assertRaises(test_case['expected_exception']):
+                        utils.check_response_length(test_case['json_data'], test_case['length_spec'])
+                        print("\033[91m" + " Failed ❌" + "\033[0m")
+                    print("\033[92m" + " Success ✅" + "\033[0m")
+                else:
+                    try:
+                        self.assertEqual(
+                            utils.check_response_length(test_case['json_data'], test_case['length_spec']),
+                            test_case['expected']
+                        )
+                        print("\033[92m" + " Success ✅" + "\033[0m")
+                    except AssertionError as e:
+                        print("\033[91m" + " Failed ❌" + "\033[0m")
+
+class TestMeasureTime(unittest.TestCase):
+    def test_measure_time(self):
+        print("Testing measure_time...")
+        with patch('dasty_api.utils.get_current_time') as mock_time:
+            mock_time.side_effect = [100, 101]
+
+            def sample_function():
+                return "sample response"
+
+            try:
+                response, time_taken = utils.measure_time(sample_function)
+                self.assertEqual(response, "sample response")
+                self.assertEqual(time_taken, "1000.00")
+                print("\tMeasure time with controlled function... \033[92m Success ✅\033[0m")
+            except AssertionError as e:
+                print("\tMeasure time with controlled function... \033[91m Failed ❌\033[0m")
+                print(f"Expected sample response, got {response}")
+                print(f"Expected 1000.00, got {time_taken}")
 
 if __name__ == '__main__':
     unittest.main()
