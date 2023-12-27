@@ -1,0 +1,47 @@
+name: "Integration Test: Benchmarkers"
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        pip install -r ./requirements.txt
+
+    - name: Start simple server
+      run: |
+        python ./examples/simple_server.py &
+        sleep 1  # Wait for the server to start
+
+    - name: Test BenchmarkRunner class (table output)
+      run: |
+        python3 -m tests.integration_tests.test_benchmarker
+
+    - name: Test BenchmarkRunner class (JSON output)
+      run: |
+        export OUTPUT_TYPE=json
+        python3 -m tests.integration_tests.test_benchmarker
+
+    - name: Test BenchmarkRunner class (YAML output)
+      run: |
+        export OUTPUT_TYPE=yaml
+        python3 -m tests.integration_tests.test_benchmarker
+
+    - name: Test BenchmarkRunner class (CSV output)
+      run: |
+        export OUTPUT_TYPE=csv
+        python3 -m tests.integration_tests.test_benchmarker
