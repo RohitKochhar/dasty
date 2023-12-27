@@ -29,4 +29,4 @@ jobs:
 
     - name: Test ScenarioRunner class
       run: |
-        python3 -m tests.test_scenario_runner
+        python3 -m tests.integration_tests.test_scenario_runner

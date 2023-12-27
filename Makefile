@@ -3,48 +3,41 @@ RED=\033[0;31m
 GREEN=\033[0;32m
 NO_COLOR=\033[0m
 
-test-scenarios:
-	python3 -m tests.test_scenario_runner
+# Function to run a test
+# Arguments:
+#   1 - Test Type (ScenarioRunner or Benchmarker)
+#   2 - Output Type (NA, table, yaml, json, csv)
+#   3 - Silent Mode (true or false)
+define run_test
+	@echo "---- Testing the $(1) $(2) ----"
+	@SILENT=$(3) sh ./tests/integration_tests/scripts/integration_test_runner.sh $(1) $(2)
+	@if [ $$? -ne 0 ]; then \
+		echo "$(RED)$(1) $(2) test failed!$(NO_COLOR)"; \
+		exit 1; \
+	else \
+		echo "$(GREEN)$(1) $(2) test complete$(NO_COLOR)"; \
+	fi
+endef
+
+integration-test-scenario-runner:
+	$(call run_test,ScenarioRunner,NA,false)
+
+integration-test-yaml-benchmark:
+	$(call run_test,Benchmarker,yaml,false)
+
+integration-test-json-benchmark:
+	$(call run_test,Benchmarker,json,false)
+
+integration-test-csv-benchmark:
+	$(call run_test,Benchmarker,csv,false)
+
+integration-test-table-benchmark:
+	$(call run_test,Benchmarker,table,false)
 
 run-test-suite:
 	@echo "Running test suite..."
-	@echo "---- Testing the scenario_runner ----"
-	@SILENT=true sh ./tests/scripts/test_scenario_runner.sh
-	@if [ $$? -ne 0 ]; then \
-		echo "$(RED)Scenario runner test failed!$(NO_COLOR)"; \
-		exit 1; \
-	else \
-		echo "$(GREEN)Scenario runner test complete$(NO_COLOR)"; \
-	fi
-	@echo "---- Testing the table benchmarker ----"
-	@SILENT=true sh ./tests/scripts/test_benchmarker.sh
-	@if [ $$? -ne 0 ]; then \
-		echo "$(RED)Table benchmarker test failed!$(NO_COLOR)"; \
-		exit 1; \
-	else \
-		echo "$(GREEN)Table benchmarker test complete$(NO_COLOR)"; \
-	fi
-	@echo "---- Testing the yaml benchmarker ----"
-	@export SILENT=true; export OUTPUT_TYPE=yaml; sh ./tests/scripts/test_benchmarker.sh
-	@if [ $$? -ne 0 ]; then \
-		echo "$(RED)YAML benchmarker test failed!$(NO_COLOR)"; \
-		exit 1; \
-	else \
-		echo "$(GREEN)YAML benchmarker test complete$(NO_COLOR)"; \
-	fi
-	@echo "---- Testing the json benchmarker ----"
-	@export SILENT=true; export OUTPUT_TYPE=json; sh ./tests/scripts/test_benchmarker.sh
-	@if [ $$? -ne 0 ]; then \
-		echo "$(RED)JSON benchmarker test failed!$(NO_COLOR)"; \
-		exit 1; \
-	else \
-		echo "$(GREEN)JSON benchmarker test complete$(NO_COLOR)"; \
-	fi
-	@echo "---- Testing the csv benchmarker ----"
-	@export SILENT=true; export OUTPUT_TYPE=csv; sh ./tests/scripts/test_benchmarker.sh
-	@if [ $$? -ne 0 ]; then \
-		echo "$(RED)csv benchmarker test failed!$(NO_COLOR)"; \
-		exit 1; \
-	else \
-		echo "$(GREEN)csv benchmarker test complete$(NO_COLOR)"; \
-	fi
+	$(call run_test,ScenarioRunner,NA,true)
+	$(call run_test,Benchmarker,table,true)
+	$(call run_test,Benchmarker,yaml,true)
+	$(call run_test,Benchmarker,json,true)
+	$(call run_test,Benchmarker,csv,true)

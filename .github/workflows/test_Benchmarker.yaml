@@ -29,19 +29,19 @@ jobs:
 
     - name: Test BenchmarkRunner class (table output)
       run: |
-        python3 -m tests.test_benchmarker
+        python3 -m tests.integration_tests.test_benchmarker
 
     - name: Test BenchmarkRunner class (JSON output)
       run: |
         export OUTPUT_TYPE=json
-        python3 -m tests.test_benchmarker
+        python3 -m tests.integration_tests.test_benchmarker
 
     - name: Test BenchmarkRunner class (YAML output)
       run: |
         export OUTPUT_TYPE=yaml
-        python3 -m tests.test_benchmarker
+        python3 -m tests.integration_tests.test_benchmarker
 
     - name: Test BenchmarkRunner class (CSV output)
       run: |
         export OUTPUT_TYPE=csv
-        python3 -m tests.test_benchmarker
+        python3 -m tests.integration_tests.test_benchmarker
