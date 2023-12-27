@@ -41,3 +41,9 @@ run-test-suite:
 	$(call run_test,Benchmarker,yaml,true)
 	$(call run_test,Benchmarker,json,true)
 	$(call run_test,Benchmarker,csv,true)
+
+cov-gen:
+	@echo "Generating coverage report..."
+	coverage run -m unittest
+	coverage report
+	coverage html
