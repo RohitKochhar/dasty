@@ -6,10 +6,10 @@ from ..Scenario import Scenario
 from .BenchmarkerStep import BenchmarkerStep
 from tabulate import tabulate # type: ignore
 
-class BenchmarkingScenario(Scenario):
+class BenchmarkerScenario(Scenario):
     def __init__(self, filepath: str, output="table") -> None:
         """
-        Initializes a BenchmarkingScenario object by loading and parsing a YAML file.
+        Initializes a BenchmarkerScenario object by loading and parsing a YAML file.
 
         Args:
             filepath (str): The path to the YAML file containing the scenario definition.
