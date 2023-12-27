@@ -1,4 +1,4 @@
-name: Run Server and Scenario Tests
+name: Test ScenarioRunner class
 
 on:
   push:
@@ -25,8 +25,8 @@ jobs:
     - name: Start simple server
       run: |
         python ./examples/simple_server.py &
-        sleep 3  # Wait for the server to start
+        sleep 1  # Wait for the server to start
 
-    - name: Run scenario tests
+    - name: Test ScenarioRunner class
       run: |
-        python3 -m tests.test_classes
+        python3 -m tests.test_scenario_runner
