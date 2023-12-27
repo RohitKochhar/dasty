@@ -1,5 +1,5 @@
 from ..ScenarioRunner import ScenarioRunner
-from .BenchmarkingScenario import BenchmarkingScenario
+from .BenchmarkerScenario import BenchmarkerScenario
 
 class Benchmarker(ScenarioRunner):
     def __init__(self, directory_name: str, tags=None, output="table", **kwargs):
@@ -22,7 +22,7 @@ class Benchmarker(ScenarioRunner):
         Collects all the YAML scenarios in the directory and returns them.
 
         Returns:
-            list: A list of BenchmarkingScenario objects representing the scenarios found.
+            list: A list of BenchmarkerScenario objects representing the scenarios found.
         """
         scenario_filepaths = self.directory.glob("*.yaml")
-        return [BenchmarkingScenario(filepath=str(filepath), output=self.output) for filepath in scenario_filepaths]
+        return [BenchmarkerScenario(filepath=str(filepath), output=self.output) for filepath in scenario_filepaths]
