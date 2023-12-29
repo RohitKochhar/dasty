@@ -58,6 +58,28 @@ class TestCheckResponseBodyIncludes(unittest.TestCase):
                 except AssertionError as e:
                     print("\033[91m" + " Failed ❌" + "\033[0m")
 
+    def test_response_body_includes_with_list_yaml_data(self):
+        test_cases = [
+            {
+                'name': 'List in YAML data',
+                'json_data': [{'name': 'Alice'}, {'name': 'Bob'}],
+                'yaml_data': [{'name': 'Alice'}, {'name': 'Bob'}],
+                'expected': True
+            },
+            {
+                'name': 'Partial match in list YAML data',
+                'json_data': [{'name': 'Alice'}, {'name': 'Bob'}],
+                'yaml_data': [{'name': 'Charlie'}],
+                'expected': False
+            },
+        ]
+        for test_case in test_cases:
+            with self.subTest(test_case['name']):
+                self.assertEqual(
+                    utils.check_response_body_contains(test_case['json_data'], test_case['yaml_data']),
+                    test_case['expected']
+                )
+
 class TestVariableReplacement(unittest.TestCase):
     def test_replace_variables_in_string(self):
         test_cases = [
@@ -185,6 +207,42 @@ class TestCheckResponseLength(unittest.TestCase):
                         print("\033[92m" + " Success ✅" + "\033[0m")
                     except AssertionError as e:
                         print("\033[91m" + " Failed ❌" + "\033[0m")
+
+    def test_check_response_length_with_single_integer(self):
+        test_cases = [
+            {
+                'name': 'Length matches single integer',
+                'json_data': [1, 2, 3, 4],
+                'length_spec': 4,
+                'expected': True,
+                'expected_exception': None
+            },
+            {
+                'name': 'Length does not match single integer',
+                'json_data': [1, 2, 3],
+                'length_spec': 4,
+                'expected': False,
+                'expected_exception': AssertionError
+            },
+            {
+                'name': 'Non-list data with single integer length',
+                'json_data': {'name': 'John'},
+                'length_spec': 4,
+                'expected': False,
+                'expected_exception': AssertionError
+            }
+        ]
+
+        for test_case in test_cases:
+            with self.subTest(test_case['name']):
+                if test_case['expected_exception']:
+                    with self.assertRaises(test_case['expected_exception']):
+                        utils.check_response_length(test_case['json_data'], test_case['length_spec'])
+                else:
+                    self.assertEqual(
+                        utils.check_response_length(test_case['json_data'], test_case['length_spec']),
+                        test_case['expected']
+                    )
 
 class TestMeasureTime(unittest.TestCase):
     def test_measure_time(self):
