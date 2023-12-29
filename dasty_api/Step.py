@@ -120,17 +120,17 @@ class Step:
         if self.response_includes:
             includes = replace_variables(self.response_includes, variables)
             assert check_response_body_contains(response_json, includes), \
-                f'Error during \"{self.name}\" step: Response does not include expected content.'
+                f'Error during \"{self.name}\" step: Response ({response_json}) does not include expected content: {includes}'
 
         if self.response_excludes:
             excludes = replace_variables(self.response_excludes, variables)
             assert not check_response_body_contains(response_json, excludes), \
-                f'Error during \"{self.name}\" step: Response includes excluded content.'
+                f'Error during \"{self.name}\" step: Response ({response_json}) includes excluded content: {excludes} '
 
         if self.response_length:
             lengths = replace_variables(self.response_length, variables)
             assert check_response_length(response_json, lengths), \
-                f'Error during \"{self.name}\" step: Response length mismatch.'
+                f'Error during \"{self.name}\" step: Response ({response_json}) length mismatch: {lengths}'
 
     def _extract_and_output(self, response_json, variables):
         """
