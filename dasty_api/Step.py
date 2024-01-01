@@ -65,6 +65,9 @@ class Step:
         if self.request_body:
             self.request_body = {k: replace_variables(v, variables)
                                  for k, v in self.request_body.items()}
+        if self.headers:
+            self.headers = {k: replace_variables(v, variables)
+                            for k, v in self.headers.items()}
 
     def _make_request(self):
         """
